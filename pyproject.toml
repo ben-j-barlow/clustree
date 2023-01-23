@@ -5,11 +5,13 @@ description = ""
 authors = ["Ben Barlow <ben-j-barlow.1@gmail.com>"]
 readme = "README.md"
 packages = [
-    { include = "clustree", from = "src" },
+    { include = "clustree" },
 ]
 
 [tool.poetry.dependencies]
 python = "^3.9"
+pillow = "^9.4.0"
+pandas = "^1.5.3"
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.12.0"
@@ -21,12 +23,11 @@ pytest = "^7.2.1"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.pytest.ini_options]
-pythonpath = "src"
-
 [tool.isort]
 profile = "black"
-line_length = 88
 
 [tool.black]
 line-length = 88
+
+[tool.pytest.ini_options]
+pythonpath = "src"
