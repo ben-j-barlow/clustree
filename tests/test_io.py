@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 from PIL import Image
 
-from clustree.helpers import read_images
+from clustree.io import read_images
 
 
 def test_read_images():
