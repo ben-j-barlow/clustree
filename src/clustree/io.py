@@ -1,32 +1,36 @@
+from collections import defaultdict
 from pathlib import Path
-from typing import Union
+from typing import List, Union
 
-from PIL import Image
+import matplotlib.pyplot as plt
+import numpy as np
+
+from clustree._factories import get_fake_img
 
 
 def read_images(
-    kk: int, path: Union[str, Path], errors: bool = True
-) -> dict[str, Image]:
+    to_read: List[str], path: Union[str, Path], errors: bool = True
+) -> defaultdict[str, dict[str, np.ndarray]]:
     """
-    Given kk, read images named 'K_k.png' for 1 <= k <= K, 1 <= K <= kk. Can include real or fake images.
+    Read list of files from a given directory using plt.imread.
 
-    :param kk: int, highest cluster resolution to read.
+    :param to_read: List[str], file names to read, show include file extension
     :param path: str or pathlib.Path, directory containing images.
-    :param errors: bool, whether to raise error or include blank image if K_k configuration absent from directory.
+    :param errors: bool, whether to raise error or include blank image if K_k \
+    configuration absent from directory.
     :return: dict, key takes 'K_k' format, value is loaded image. Image could be fake.
     """
-    if kk < 1:
-        raise ValueError(f"cluster resolution should be greater than 0, not {str(kk)}")
     if isinstance(path, str):
         path = Path(path)
-    to_read = _get_img_name_pattern(kk=kk)
-    to_return = {}
+    to_return = defaultdict(dict)
 
     for file in to_read:
+        k_upper = file[0]
+        k_lower = file[2]
         try:
-            to_return[file] = Image.open(Path(path / f"{file}.png"))
+            to_return[k_upper][k_lower] = plt.imread(Path(path / file))
         except FileNotFoundError as err:
             if errors:
                 raise err
-            to_return[file] = _get_fake_img(k_upper=file[0], k_lower=file[2])
+            to_return[k_upper][k_lower] = get_fake_img(k_upper=k_upper, k_lower=k_lower)
     return to_return
