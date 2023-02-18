@@ -54,13 +54,28 @@ def clustree(
     return dg
 
 
+def get_pos(dg: DiGraph) -> dict[str, np.ndarray]:
+    """
+    Produce position of each node. Use multipartite_layout, scale resulting positions \
+    to [0, 1] interval and flip graph vertically by returning (1 - pos). This forces \
+    the tree to position the root node at the top rather than the bottom.
+
+    :param dg: directed graph
+    :return: (x, y) coordinates of nodes
+    """
+    pos = multipartite_layout(dg, subset_key="res", align="horizontal")
+    y_vals = {v[1] for k, v in pos.items()}
+    min_y, max_y = min(y_vals), max(y_vals)
+    return {k: 1 - ((v - min_y) / (max_y - min_y)) for k, v in pos.items()}
+
+
 def draw_clustree(
     dg: DiGraph,
     path: Union[
         str, None
     ] = "/Users/benbarlow/dev/clustree/tests/data/output/mytest.png",
 ):
-    pos = multipartite_layout(dg, subset_key="res", align="horizontal")
+    pos = get_pos(dg=dg)
     draw_with_images(dg=dg, pos=pos)
     if path:
         plt.savefig(path, dpi=400, bbox_inches="tight")
