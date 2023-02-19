@@ -3,14 +3,14 @@ from pathlib import Path
 from typing import List, Union
 
 import matplotlib.pyplot as plt
-import numpy as np
 
 from clustree._factories import get_fake_img
+from clustree.clustree_typing import IMAGE_CONFIG_TYPE
 
 
 def read_images(
     to_read: List[str], path: Union[str, Path], errors: bool = True
-) -> defaultdict[str, dict[str, np.ndarray]]:
+) -> IMAGE_CONFIG_TYPE:
     """
     Read list of files from a given directory using plt.imread.
 

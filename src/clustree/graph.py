@@ -7,12 +7,12 @@ import numpy as np
 from networkx import DiGraph, draw_networkx_edges, multipartite_layout
 
 from clustree._handle_pars import (
-    IMAGES_TYPE,
     append_k_k_cols,
     get_and_check_cluster_cols,
     handle_images,
 )
 from clustree._layer import add_layer
+from clustree.clustree_typing import IMAGE_INPUT_TYPE
 
 if typing.TYPE_CHECKING:
     from pandas import DataFrame
@@ -21,7 +21,7 @@ if typing.TYPE_CHECKING:
 def clustree(
     data: "DataFrame",
     prefix: str,
-    images: IMAGES_TYPE,
+    images: IMAGE_INPUT_TYPE,
     errors: bool = False,
     draw: bool = True,
     path: Union[

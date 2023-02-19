@@ -6,12 +6,12 @@ from typing import List, Union
 
 import numpy as np
 
+from clustree.clustree_typing import IMAGE_CONFIG_TYPE, IMAGE_INPUT_TYPE
 from clustree.io import read_images
 
 if typing.TYPE_CHECKING:
     from pandas import DataFrame
 
-IMAGES_TYPE = Union[str, Path, dict[str, np.ndarray]]
 
 
 def get_img_name_pattern(kk: int) -> list[str]:
@@ -80,8 +80,8 @@ def append_k_k_cols(data: "DataFrame", prefix: str, kk: int) -> "DataFrame":
 
 
 def handle_images(
-    images: IMAGES_TYPE, errors: bool, kk: int
-) -> Union[None, defaultdict[str, dict[str, np.ndarray]]]:
+    images: IMAGE_INPUT_TYPE, errors: bool, kk: int
+) -> IMAGE_CONFIG_TYPE:
     if isinstance(images, (str, Path)):
         return read_images(
             to_read=[f"{ele}.png" for ele in get_img_name_pattern(kk=kk)],
