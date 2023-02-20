@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from networkx import DiGraph, draw_networkx_edges, multipartite_layout
 
+from clustree._factories import ClustreeConfig
 from clustree._handle_pars import (
     append_k_k_cols,
     get_and_check_cluster_cols,
@@ -34,6 +35,7 @@ def clustree(
     cols, kk = get_and_check_cluster_cols(cols=data.columns, prefix=prefix)
     data = append_k_k_cols(data=data, prefix=prefix, kk=kk)
     _images = handle_images(images=images, kk=kk, errors=errors)
+    config = ClustreeConfig(image_cf=_images, prefix=prefix, kk=kk, data=data)
 
     prev_cluster = None
     dg = DiGraph()

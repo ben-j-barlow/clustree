@@ -3,6 +3,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any, Union
 
+import matplotlib as mpl
 import numpy as np
 
 NODE_CONFIG_TYPE = [
@@ -19,3 +20,6 @@ EDGE_CONFIG_TYPE = [
 IMAGE_CONFIG_TYPE = defaultdict[str, dict[str, np.ndarray]]
 
 IMAGE_INPUT_TYPE = Union[str, Path, dict[str, np.ndarray]]
+
+# TODO: improve typing for node_colour
+NODE_COLOUR_TYPE = Any  # Union[str, mpl.colors]  # e.g. 'samples', 'K', data col name
