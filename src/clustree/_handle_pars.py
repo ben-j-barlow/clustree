@@ -13,7 +13,6 @@ if typing.TYPE_CHECKING:
     from pandas import DataFrame
 
 
-
 def get_img_name_pattern(kk: int) -> list[str]:
     """
     Given kk, produce list of form 'K_k'. \
@@ -79,9 +78,7 @@ def append_k_k_cols(data: "DataFrame", prefix: str, kk: int) -> "DataFrame":
     return data
 
 
-def handle_images(
-    images: IMAGE_INPUT_TYPE, errors: bool, kk: int
-) -> IMAGE_CONFIG_TYPE:
+def handle_images(images: IMAGE_INPUT_TYPE, errors: bool, kk: int) -> IMAGE_CONFIG_TYPE:
     if isinstance(images, (str, Path)):
         return read_images(
             to_read=[f"{ele}.png" for ele in get_img_name_pattern(kk=kk)],
