@@ -13,10 +13,11 @@ from PIL import Image, ImageDraw, ImageFont
 from clustree.clustree_typing import (
     EDGE_CONFIG_TYPE,
     IMAGE_CONFIG_TYPE,
-    NODE_CMAP_TYPE,
-    NODE_COLOR_AGG_TYPE,
+    CMAP_TYPE,
+    COLOR_AGG_TYPE,
     NODE_COLOR_TYPE,
     NODE_CONFIG_TYPE,
+    EDGE_COLOR_TYPE,
 )
 
 control_list = ["init", "sample_info", "image", "node_color", "draw"]
@@ -61,8 +62,8 @@ class ClustreeConfig:
         image_cf: IMAGE_CONFIG_TYPE,
         prefix: str,
         node_color: NODE_COLOR_TYPE = None,
-        node_color_aggr: NODE_COLOR_AGG_TYPE = None,
-        node_cmap: NODE_CMAP_TYPE = None,
+        node_color_aggr: COLOR_AGG_TYPE = None,
+        node_cmap: CMAP_TYPE = None,
         _setup_cf: Optional[dict[str, bool]] = None,
     ):
         if not node_color:
@@ -115,9 +116,7 @@ class ClustreeConfig:
         for k_upper in range(1, self.kk + 1):
             for k_lower in range(1, k_upper + 1):
                 ind = ClustreeConfig.hash_k_k(k_upper=k_upper, k_lower=k_lower)
-                self.node_cf[ind].update(
-                    {"k": k_lower, "res": k_upper}
-                )
+                self.node_cf[ind].update({"k": k_lower, "res": k_upper})
             self.k_upper_to_node_id[k_upper] = ClustreeConfig.hash_k_k(
                 k_upper=k_upper, k_lower=list(range(1, k_upper + 1))
             )
@@ -190,8 +189,8 @@ class ClustreeConfig:
     def set_node_color(
         self,
         node_color: NODE_COLOR_TYPE,
-        cmap: Optional[mpl.colors.Colormap],
-        aggr: Optional[Callable],
+        cmap: CMAP_TYPE,
+        aggr: COLOR_AGG_TYPE,
         data: pd.DataFrame,
         prefix: str,
     ) -> None:
@@ -226,9 +225,10 @@ class ClustreeConfig:
             for node_id in self.node_cf:
                 self.node_cf[node_id]["node_color"] = node_color
 
+
 def _data_to_color(
     data: dict[int, Union[int, float]],
-    cmap: mpl.colors.Colormap = mpl.cm.Blues,
+    cmap: mpl.colormaps = mpl.cm.Blues,
     return_sm: bool = True,
 ) -> Union[
     dict[int, tuple[float, float, float, float]],
