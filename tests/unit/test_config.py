@@ -221,6 +221,72 @@ def test_set_node_color_fixed(iris_data):
     assert act_color == ["C1" for _ in range(6)]
 
 
+def test_set_edge_color_prefix(iris_data):
+    setup_cf = test_setup_config
+    setup_cf.update({"sample_info": True, "edge_color": True})
+    cf = cfg(
+        kk=3,
+        prefix="K",
+        data=iris_data,
+        image_cf=None,
+        _setup_cf=setup_cf,
+        edge_color="K",
+    )
+    exp = [f"C{res}" for res in [2, 2, 3, 3, 3, 3]]
+    assert [cf.edge_cf[k]["edge_color"] for k in cf.edge_cf] == exp
+
+
+def test_set_edge_color_samples(iris_data):
+    setup_cf = test_setup_config
+    setup_cf.update({"sample_info": True, "edge_color": True})
+    cf = cfg(
+        kk=3,
+        prefix="K",
+        data=iris_data,
+        image_cf=None,
+        _setup_cf=setup_cf,
+        edge_color="samples",
+    )
+    act_color = [v["edge_color"] for k, v in cf.edge_cf.items()]
+    edge_id = [
+        cfg.hash_k_k(k_upper=2, k_lower=1, k_start=1),
+        cfg.hash_k_k(k_upper=2, k_lower=2, k_start=1),
+        cfg.hash_k_k(k_upper=3, k_lower=1, k_start=1),
+        cfg.hash_k_k(k_upper=3, k_lower=2, k_start=1),
+        cfg.hash_k_k(k_upper=3, k_lower=2, k_start=2),
+        cfg.hash_k_k(k_upper=3, k_lower=3, k_start=2),
+    ]
+
+    samples = [70, 80, 45, 25, 20, 60]
+
+    exp_color = _data_to_color(
+        data={k: v for k, v in zip(edge_id, samples)},
+        cmap=mpl.cm.Reds,
+        return_sm=False,
+    )
+
+    # actual
+    act_color = {k: v["edge_color"] for k, v in cf.edge_cf.items()}
+    assert all([isinstance(v["edge_color"], tuple) for k, v in cf.edge_cf.items()])
+    assert exp_color == act_color
+
+
+def test_set_edge_color_fixed(iris_data):
+    setup_cf = test_setup_config
+    setup_cf.update({"sample_info": True, "edge_color": True})
+    cf = cfg(
+        kk=3,
+        prefix="K",
+        data=iris_data,
+        image_cf=None,
+        _setup_cf=setup_cf,
+        edge_color="C1",
+    )
+    act_color = [v["edge_color"] for k, v in cf.edge_cf.items()]
+    assert all([isinstance(v["edge_color"], str) for k, v in cf.edge_cf.items()])
+    assert act_color == ["C1" for _ in range(6)]
+
+
 def test_hash_k_k():
     assert szudzik.pair(1, 2, 3) == cfg.hash_k_k(1, 2, 3)
     assert szudzik.pair(1, 2) == cfg.hash_k_k(1, 2)

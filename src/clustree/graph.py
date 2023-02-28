@@ -3,7 +3,12 @@ from typing import Union
 
 import matplotlib.pyplot as plt
 import numpy as np
-from networkx import DiGraph, draw_networkx_edges, multipartite_layout
+from networkx import (
+    DiGraph,
+    draw_networkx_edges,
+    get_edge_attributes,
+    multipartite_layout,
+)
 
 from clustree._handle_pars import (
     append_k_k_cols,
@@ -13,6 +18,7 @@ from clustree._handle_pars import (
 from clustree.clustree_typing import (
     CMAP_TYPE,
     COLOR_AGG_TYPE,
+    EDGE_COLOR_TYPE,
     IMAGE_INPUT_TYPE,
     NODE_COLOR_TYPE,
 )
@@ -34,6 +40,8 @@ def clustree(
     node_color: NODE_COLOR_TYPE = None,
     node_color_aggr: COLOR_AGG_TYPE = None,
     node_cmap: CMAP_TYPE = None,
+    edge_color: EDGE_COLOR_TYPE = None,
+    edge_cmap: CMAP_TYPE = None,
 ) -> DiGraph:
     cols, kk = get_and_check_cluster_cols(cols=data.columns, prefix=prefix)
     data = append_k_k_cols(data=data, prefix=prefix, kk=kk)
@@ -46,6 +54,8 @@ def clustree(
         node_color=node_color,
         node_color_aggr=node_color_aggr,
         node_cmap=node_cmap,
+        edge_color=edge_color,
+        edge_cmap=edge_cmap,
     )
 
     dg = construct_clustree(cf=config)
@@ -96,7 +106,12 @@ def draw_with_images(
     fig, ax = plt.subplots()
 
     node_shape = "s"
-    draw_networkx_edges(G=dg, pos=pos, node_shape=node_shape)
+    colors = get_edge_attributes(dg, "edge_color").values()
+    alpha = get_edge_attributes(dg, "alpha").values()
+
+    draw_networkx_edges(
+        G=dg, pos=pos, node_shape=node_shape, edge_color=colors, alpha=list(alpha)
+    )
 
     tr_figure = ax.transData.transform
     tr_axes = fig.transFigure.inverted().transform

@@ -9,6 +9,7 @@ from pairing_functions import szudzik
 from clustree.clustree_typing import (
     CMAP_TYPE,
     COLOR_AGG_TYPE,
+    EDGE_COLOR_TYPE,
     EDGE_CONFIG_TYPE,
     IMAGE_CONFIG_TYPE,
     NODE_COLOR_TYPE,
@@ -16,7 +17,7 @@ from clustree.clustree_typing import (
 )
 from clustree.config_helpers import _data_to_color, draw_circle
 
-control_list = ["init", "sample_info", "image", "node_color", "draw"]
+control_list = ["init", "sample_info", "image", "node_color", "edge_color", "draw"]
 default_setup_config = {k: True for k in control_list}
 
 
@@ -30,14 +31,20 @@ class ClustreeConfig:
         node_color: NODE_COLOR_TYPE = None,
         node_color_aggr: COLOR_AGG_TYPE = None,
         node_cmap: CMAP_TYPE = None,
+        edge_color: EDGE_COLOR_TYPE = None,
+        edge_cmap: CMAP_TYPE = None,
         _setup_cf: Optional[dict[str, bool]] = None,
     ):
         if not node_color:
             node_color = prefix
+        if not edge_color:
+            edge_color = "samples"
         if not _setup_cf:
             _setup_cf = default_setup_config
         if not node_cmap:
             node_cmap = plt.cm.Blues
+        if not edge_cmap:
+            edge_cmap = plt.cm.Reds
 
         self.prefix = prefix
         self.kk = kk
@@ -65,6 +72,8 @@ class ClustreeConfig:
                 prefix=prefix,
                 data=data,
             )
+        if _setup_cf["edge_color"]:
+            self.set_edge_color(edge_color=edge_color, cmap=edge_cmap, prefix=prefix)
         if _setup_cf["draw"]:
             self.set_drawn_image()
 
@@ -190,3 +199,24 @@ class ClustreeConfig:
         else:  # fixed color, e.g., mpl.colors object
             for node_id in self.node_cf:
                 self.node_cf[node_id]["node_color"] = node_color
+
+    def set_edge_color(
+        self,
+        edge_color: EDGE_COLOR_TYPE,
+        cmap: CMAP_TYPE,
+        prefix: str,
+    ) -> None:
+        if edge_color == prefix:
+            for edge_id, attr in self.edge_cf.items():
+                self.edge_cf[edge_id]["edge_color"] = f"C{attr['res']}"
+        elif edge_color == "samples":
+            # create to_parse = {edge_id: value}
+            to_parse = {k: v["samples"] for k, v in self.edge_cf.items()}
+
+            # convert to_parse to {edge_id: color}
+            rgba, sm = _data_to_color(data=to_parse, cmap=cmap)
+            for k, v in rgba.items():
+                self.edge_cf[k]["edge_color"] = v
+        else:  # fixed color, e.g., mpl.colors object
+            for edge_id in self.edge_cf:
+                self.edge_cf[edge_id]["edge_color"] = edge_color
