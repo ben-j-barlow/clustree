@@ -1,4 +1,3 @@
-# TODO: switch to use TYPE_CHECKING
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Callable, Optional, Union
@@ -23,5 +22,5 @@ IMAGE_INPUT_TYPE = Union[str, Path, dict[str, np.ndarray]]
 
 # TODO: improve typing for node_color
 NODE_COLOR_TYPE = Any  # Union[str, mpl.colors]  # e.g. 'samples', 'K', data col name
-NODE_COLOR_AGG_TYPE = (Optional[Callable],)
-NODE_CMAP_TYPE = (Optional[mpl.colors.Colormap],)
+NODE_COLOR_AGG_TYPE = Optional[Callable]
+NODE_CMAP_TYPE = Optional[mpl.colors.Colormap]

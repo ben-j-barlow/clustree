@@ -35,9 +35,6 @@ def clustree(
     node_color_aggr: NODE_COLOR_AGG_TYPE = None,
     node_cmap: NODE_CMAP_TYPE = None,
 ) -> DiGraph:
-    # custom methods
-    # TODO: cut out get_and_check_cluster_cols, keep cluster as int, loop to kk,
-    #  consecutive error thrown naturally
     cols, kk = get_and_check_cluster_cols(cols=data.columns, prefix=prefix)
     data = append_k_k_cols(data=data, prefix=prefix, kk=kk)
     _images = handle_images(images=images, kk=kk, errors=errors)

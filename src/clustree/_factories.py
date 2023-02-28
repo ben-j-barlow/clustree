@@ -66,8 +66,7 @@ class ClustreeConfig:
         _setup_cf: Optional[dict[str, bool]] = None,
     ):
         if not node_color:
-            # TODO: change to "res" once implemented
-            node_color = "samples"
+            node_color = prefix
         if not _setup_cf:
             _setup_cf = default_setup_config
         if not node_cmap:
@@ -116,9 +115,8 @@ class ClustreeConfig:
         for k_upper in range(1, self.kk + 1):
             for k_lower in range(1, k_upper + 1):
                 ind = ClustreeConfig.hash_k_k(k_upper=k_upper, k_lower=k_lower)
-                # TODO: refactor to use res inplace of k_upper
                 self.node_cf[ind].update(
-                    {"k_lower": k_lower, "k_upper": k_upper, "res": k_upper}
+                    {"k": k_lower, "res": k_upper}
                 )
             self.k_upper_to_node_id[k_upper] = ClustreeConfig.hash_k_k(
                 k_upper=k_upper, k_lower=list(range(1, k_upper + 1))
@@ -137,7 +135,7 @@ class ClustreeConfig:
         for k, v in self.node_cf.items():
             self.node_cf[k]["image_with_drawing"] = draw_circle(
                 img=v["image"],
-                radius=0.1,  # TODO: implement
+                radius=0.1,
                 node_color=v["node_color"],
             )
 
@@ -227,7 +225,6 @@ class ClustreeConfig:
         else:  # fixed color, e.g., mpl.colors object
             for node_id in self.node_cf:
                 self.node_cf[node_id]["node_color"] = node_color
-
 
 def _data_to_color(
     data: dict[int, Union[int, float]],

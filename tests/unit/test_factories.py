@@ -11,24 +11,23 @@ test_setup_config = {k: False for k in control_list}
 
 
 def test_init_cf(iris_data):
-    # TODO: find out if copy is needed
     setup_cf = copy.copy(test_setup_config)
     setup_cf["init"] = True
     cf = cfg(kk=3, prefix="K", data=iris_data, image_cf=None, _setup_cf=setup_cf)
-    assert cf.node_cf[cfg.hash_k_k(1, 1)]["k_lower"] == 1
-    assert cf.node_cf[cfg.hash_k_k(1, 1)]["k_upper"] == 1
+    assert cf.node_cf[cfg.hash_k_k(1, 1)]["k"] == 1
+    assert cf.node_cf[cfg.hash_k_k(1, 1)]["res"] == 1
 
-    assert cf.node_cf[cfg.hash_k_k(2, 1)]["k_lower"] == 1
-    assert cf.node_cf[cfg.hash_k_k(2, 2)]["k_lower"] == 2
-    assert cf.node_cf[cfg.hash_k_k(2, 1)]["k_upper"] == 2
-    assert cf.node_cf[cfg.hash_k_k(2, 2)]["k_upper"] == 2
+    assert cf.node_cf[cfg.hash_k_k(2, 1)]["k"] == 1
+    assert cf.node_cf[cfg.hash_k_k(2, 2)]["k"] == 2
+    assert cf.node_cf[cfg.hash_k_k(2, 1)]["res"] == 2
+    assert cf.node_cf[cfg.hash_k_k(2, 2)]["res"] == 2
 
-    assert cf.node_cf[cfg.hash_k_k(3, 1)]["k_lower"] == 1
-    assert cf.node_cf[cfg.hash_k_k(3, 2)]["k_lower"] == 2
-    assert cf.node_cf[cfg.hash_k_k(3, 3)]["k_lower"] == 3
-    assert cf.node_cf[cfg.hash_k_k(3, 1)]["k_upper"] == 3
-    assert cf.node_cf[cfg.hash_k_k(3, 2)]["k_upper"] == 3
-    assert cf.node_cf[cfg.hash_k_k(3, 3)]["k_upper"] == 3
+    assert cf.node_cf[cfg.hash_k_k(3, 1)]["k"] == 1
+    assert cf.node_cf[cfg.hash_k_k(3, 2)]["k"] == 2
+    assert cf.node_cf[cfg.hash_k_k(3, 3)]["k"] == 3
+    assert cf.node_cf[cfg.hash_k_k(3, 1)]["res"] == 3
+    assert cf.node_cf[cfg.hash_k_k(3, 2)]["res"] == 3
+    assert cf.node_cf[cfg.hash_k_k(3, 3)]["res"] == 3
 
 
 def test_set_sample_information_node(iris_data):
