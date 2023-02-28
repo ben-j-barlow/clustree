@@ -4,8 +4,6 @@ from collections import defaultdict
 from pathlib import Path
 from typing import List, Union
 
-import numpy as np
-
 from clustree.clustree_typing import IMAGE_CONFIG_TYPE, IMAGE_INPUT_TYPE
 from clustree.io import read_images
 

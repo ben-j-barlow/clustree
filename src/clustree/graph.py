@@ -1,4 +1,3 @@
-import copy
 import typing
 from typing import Union
 
@@ -12,8 +11,12 @@ from clustree._handle_pars import (
     get_and_check_cluster_cols,
     handle_images,
 )
-from clustree._layer import add_layer
-from clustree.clustree_typing import IMAGE_INPUT_TYPE
+from clustree.clustree_typing import (
+    IMAGE_INPUT_TYPE,
+    NODE_CMAP_TYPE,
+    NODE_COLOR_AGG_TYPE,
+    NODE_COLOR_TYPE,
+)
 
 if typing.TYPE_CHECKING:
     from pandas import DataFrame
@@ -28,6 +31,9 @@ def clustree(
     path: Union[
         str, None
     ] = "/Users/benbarlow/dev/clustree/tests/data/output/mytest.png",
+    node_color: NODE_COLOR_TYPE = None,
+    node_color_aggr: NODE_COLOR_AGG_TYPE = None,
+    node_cmap: NODE_CMAP_TYPE = None,
 ) -> DiGraph:
     # custom methods
     # TODO: cut out get_and_check_cluster_cols, keep cluster as int, loop to kk,
@@ -35,24 +41,26 @@ def clustree(
     cols, kk = get_and_check_cluster_cols(cols=data.columns, prefix=prefix)
     data = append_k_k_cols(data=data, prefix=prefix, kk=kk)
     _images = handle_images(images=images, kk=kk, errors=errors)
-    config = ClustreeConfig(image_cf=_images, prefix=prefix, kk=kk, data=data)
+    config = ClustreeConfig(
+        image_cf=_images,
+        prefix=prefix,
+        kk=kk,
+        data=data,
+        node_color=node_color,
+        node_color_aggr=node_color_aggr,
+        node_cmap=node_cmap,
+    )
 
-    prev_cluster = None
-    dg = DiGraph()
-    for res in range(1, kk + 1):
-        cluster = data[f"{str(res)}_k"]
-
-        add_layer(
-            k_upper=res,
-            prev_cluster=prev_cluster,
-            cluster=cluster,
-            images=_images[str(res)],
-            dg=dg,
-        )
-        prev_cluster = copy.copy(cluster)
-
+    dg = construct_clustree(cf=config)
     if draw:
         draw_clustree(dg=dg, path=path)
+    return dg
+
+
+def construct_clustree(cf: ClustreeConfig) -> DiGraph:
+    dg = DiGraph()
+    dg.add_nodes_from([(k, v) for k, v in cf.node_cf.items()])
+    dg.add_edges_from([(v["start"], v["end"], v) for v in cf.edge_cf.values()])
     return dg
 
 
@@ -86,11 +94,11 @@ def draw_clustree(
 def draw_with_images(
     dg: DiGraph,
     pos: dict[str, np.ndarray],
-    node_shape="s",
     icon_size: float = 0.04,
 ):
     fig, ax = plt.subplots()
 
+    node_shape = "s"
     draw_networkx_edges(G=dg, pos=pos, node_shape=node_shape)
 
     tr_figure = ax.transData.transform
@@ -105,7 +113,7 @@ def draw_with_images(
         xa, ya = tr_axes((xf, yf))
         a = plt.axes([xa - icon_center, ya - icon_center, icon_size, icon_size])
 
-        a.imshow(dg.nodes[n]["image"])
+        a.imshow(dg.nodes[n]["image_with_drawing"])
 
         a.patch.set_visible(False)
         a.axis("off")
