@@ -4,8 +4,8 @@ import matplotlib as mpl
 import pytest
 from pairing_functions import szudzik
 
-from clustree._factories import ClustreeConfig as cfg
-from clustree._factories import _data_to_color, control_list
+from clustree.config import ClustreeConfig as cfg
+from clustree.config import _data_to_color, control_list
 
 test_setup_config = {k: False for k in control_list}
 

@@ -3,7 +3,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pytest
 
-from clustree._factories import ClustreeConfig as cfg
+from clustree.config import ClustreeConfig as cfg
 from clustree.graph import clustree
 from tests.helpers import INPUT_DIR, OUTPUT_DIR
 

@@ -4,7 +4,6 @@ from typing import List, Union
 
 import matplotlib.pyplot as plt
 
-from clustree._factories import get_fake_img
 from clustree.clustree_typing import IMAGE_CONFIG_TYPE
 
 

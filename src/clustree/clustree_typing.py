@@ -22,5 +22,6 @@ IMAGE_INPUT_TYPE = Union[str, Path, dict[str, np.ndarray]]
 
 # TODO: improve typing for node_color
 NODE_COLOR_TYPE = Any  # Union[str, mpl.colors]  # e.g. 'samples', 'K', data col name
-NODE_COLOR_AGG_TYPE = Optional[Callable]
-NODE_CMAP_TYPE = Optional[mpl.colors.Colormap]
+EDGE_COLOR_TYPE = Any
+COLOR_AGG_TYPE = Optional[Callable]
+CMAP_TYPE = Optional[mpl.colors.Colormap]

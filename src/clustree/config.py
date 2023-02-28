@@ -1,57 +1,23 @@
-import tempfile
 from collections import defaultdict
-from typing import Any, Callable, List, Optional, Union
+from typing import Any, List, Optional, Union
 
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from matplotlib.cm import ScalarMappable
 from pairing_functions import szudzik
-from PIL import Image, ImageDraw, ImageFont
 
 from clustree.clustree_typing import (
-    EDGE_CONFIG_TYPE,
-    IMAGE_CONFIG_TYPE,
     CMAP_TYPE,
     COLOR_AGG_TYPE,
+    EDGE_CONFIG_TYPE,
+    IMAGE_CONFIG_TYPE,
     NODE_COLOR_TYPE,
     NODE_CONFIG_TYPE,
-    EDGE_COLOR_TYPE,
 )
+from clustree.config_helpers import _data_to_color, draw_circle
 
 control_list = ["init", "sample_info", "image", "node_color", "draw"]
 default_setup_config = {k: True for k in control_list}
-
-
-def draw_circle(
-    img: np.ndarray,
-    radius: float = 0.1,
-    node_color: str = "red",
-    img_width: int = 100,
-    img_height: int = 100,
-) -> np.ndarray:
-    fig, ax = plt.subplots()
-    ax.imshow(img, extent=[0, img_width, 0, img_height])
-
-    # Calculate radius and coordinates
-    radius *= img_width
-    x0 = img_width - radius
-    y0 = img_height - radius
-
-    # Add a circle at the top right of the image
-    circle = plt.Circle((x0, y0), radius=radius, fill=True, color=node_color)
-    ax.add_artist(circle)
-
-    # save and read in
-    fig.patch.set_visible(False)
-    ax.axis("off")
-    with tempfile.NamedTemporaryFile(suffix=".png") as f:
-        file_path = f.name
-        plt.savefig(file_path, dpi=200, bbox_inches="tight")
-        to_return = plt.imread(file_path)
-        plt.close()
-        return to_return
 
 
 class ClustreeConfig:
@@ -224,54 +190,3 @@ class ClustreeConfig:
         else:  # fixed color, e.g., mpl.colors object
             for node_id in self.node_cf:
                 self.node_cf[node_id]["node_color"] = node_color
-
-
-def _data_to_color(
-    data: dict[int, Union[int, float]],
-    cmap: mpl.colormaps = mpl.cm.Blues,
-    return_sm: bool = True,
-) -> Union[
-    dict[int, tuple[float, float, float, float]],
-    tuple[dict[int, tuple[float, float, float, float]], ScalarMappable],
-]:
-    """
-
-    Parameters
-    ----------
-    data
-        Node / edge id as key and value to use for RGBA mapping as value. For example, \
-        if determining RGBA value for node_color, value of dict could be #samples.
-    cmap
-        Colormap to use for int to RGBA mapping.
-
-    Returns
-    -------
-        The keys (node or edge key) and RGBA values.
-
-        The ScalarMappable object to allow colorbar visualization at plot time.
-    """
-    val = data.values()
-    norm = mpl.colors.Normalize(vmin=min(val), vmax=max(val))
-    sm = mpl.cm.ScalarMappable(norm=norm, cmap=cmap)
-    if return_sm:
-        return {k: sm.to_rgba(v) for k, v in data.items()}, sm
-    return {k: sm.to_rgba(v) for k, v in data.items()}
-
-
-def get_fake_img(k_upper: str, k_lower: str, w: int = 40, h: int = 40) -> np.ndarray:
-    """
-    Create fake image reading 'K_k'.
-
-    :param k_upper: cluster resolution
-    :param k_lower: cluster number
-    :param w: number of pixels
-    :param h: number of pixels
-    :return: image with white background and black text
-    """
-    img = Image.new("RGB", (w, h), color=(255, 255, 255))
-    draw = ImageDraw.Draw(img)
-    font = ImageFont.load_default()
-    out = f"{k_upper}_{k_lower}"
-    _, _, i, j = draw.textbbox((0, 0), out, font=font)
-    draw.text(((w - i) / 2, (h - j) / 2), out, font=font, fill="black")
-    return np.asarray(img)

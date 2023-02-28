@@ -5,18 +5,18 @@ import matplotlib.pyplot as plt
 import numpy as np
 from networkx import DiGraph, draw_networkx_edges, multipartite_layout
 
-from clustree._factories import ClustreeConfig
 from clustree._handle_pars import (
     append_k_k_cols,
     get_and_check_cluster_cols,
     handle_images,
 )
 from clustree.clustree_typing import (
+    CMAP_TYPE,
+    COLOR_AGG_TYPE,
     IMAGE_INPUT_TYPE,
-    NODE_CMAP_TYPE,
-    NODE_COLOR_AGG_TYPE,
     NODE_COLOR_TYPE,
 )
+from clustree.config import ClustreeConfig
 
 if typing.TYPE_CHECKING:
     from pandas import DataFrame
@@ -32,8 +32,8 @@ def clustree(
         str, None
     ] = "/Users/benbarlow/dev/clustree/tests/data/output/mytest.png",
     node_color: NODE_COLOR_TYPE = None,
-    node_color_aggr: NODE_COLOR_AGG_TYPE = None,
-    node_cmap: NODE_CMAP_TYPE = None,
+    node_color_aggr: COLOR_AGG_TYPE = None,
+    node_cmap: CMAP_TYPE = None,
 ) -> DiGraph:
     cols, kk = get_and_check_cluster_cols(cols=data.columns, prefix=prefix)
     data = append_k_k_cols(data=data, prefix=prefix, kk=kk)
