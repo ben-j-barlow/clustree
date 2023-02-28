@@ -1,59 +1,45 @@
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import pandas as pd
 import pytest
 
+from clustree.config import ClustreeConfig as cfg
 from clustree.graph import clustree
 from tests.helpers import INPUT_DIR, OUTPUT_DIR
 
-DATA_FILES = pytest.mark.datafiles(
+IMG_FILES = pytest.mark.datafiles(
     INPUT_DIR + "1_1.png",
     INPUT_DIR + "2_1.png",
     INPUT_DIR + "2_2.png",
     INPUT_DIR + "3_1.png",
     INPUT_DIR + "3_2.png",
     INPUT_DIR + "3_3.png",
-    INPUT_DIR + "iris.csv",
 )
 
 
-@DATA_FILES
-def test_clustree(datafiles):
-    to_read = [Path(ele) for ele in datafiles.listdir()]
-    data_files = {
-        file.stem: pd.read_csv(file) for file in to_read if file.suffix == ".csv"
-    }
-    iris = data_files["iris"]
-
-    dg = clustree(data=iris, prefix="K", images=INPUT_DIR, draw=False, path=None)
+def test_clustree(datafiles, iris_data):
+    dg = clustree(data=iris_data, prefix="K", images=INPUT_DIR, draw=False, path=None)
 
     assert dg.number_of_edges() == 6
     assert dg.number_of_nodes() == 6
     assert set(dg.edges) == {
-        ("1_1", "2_1"),
-        ("1_1", "2_2"),
-        ("2_1", "3_1"),
-        ("2_1", "3_2"),
-        ("2_2", "3_2"),
-        ("2_2", "3_3"),
+        (cfg.hash_k_k(1, 1), cfg.hash_k_k(2, 1)),
+        (cfg.hash_k_k(1, 1), cfg.hash_k_k(2, 2)),
+        (cfg.hash_k_k(2, 1), cfg.hash_k_k(3, 1)),
+        (cfg.hash_k_k(2, 1), cfg.hash_k_k(3, 2)),
+        (cfg.hash_k_k(2, 2), cfg.hash_k_k(3, 2)),
+        (cfg.hash_k_k(2, 2), cfg.hash_k_k(3, 3)),
     }
 
 
-@DATA_FILES
-def test_clustree_draw(datafiles):
+@IMG_FILES
+def test_clustree_draw(datafiles, iris_data):
     to_read = [Path(ele) for ele in datafiles.listdir()]
-    img_files = {
-        file.stem: plt.imread(file) for file in to_read if file.suffix == ".png"
-    }
-    data_files = {
-        file.stem: pd.read_csv(file) for file in to_read if file.suffix == ".csv"
-    }
-    iris = data_files["iris"]
+    img_files = {file.stem: plt.imread(file) for file in to_read}
 
     # images as dict
     clustree(
-        data=iris,
+        data=iris_data,
         prefix="K",
         images=img_files,
         draw=True,
@@ -62,7 +48,7 @@ def test_clustree_draw(datafiles):
 
     # images as str
     clustree(
-        data=iris,
+        data=iris_data,
         prefix="K",
         images=INPUT_DIR,
         draw=True,
@@ -71,7 +57,7 @@ def test_clustree_draw(datafiles):
 
     # images as path
     clustree(
-        data=iris,
+        data=iris_data,
         prefix="K",
         images=Path(INPUT_DIR),
         draw=True,
