@@ -22,11 +22,21 @@
 
 ### Installation
 
-TO ADD.
+Install the package with pip:
+
+```
+pip install clustree==0.1.6
+```
 
 ### Quickstart
 
-The powerhouse function of the library is `clustree`. See details on its usage below.
+The powerhouse function of the library is `clustree`. Use
+
+```
+from clustree import clustree
+```
+
+to import the function. Details on the parameters is provided below.
 
 ```
 def clustree(
