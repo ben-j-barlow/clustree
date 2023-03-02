@@ -25,13 +25,13 @@ def clustree(
     prefix: str,
     images: IMAGE_INPUT_TYPE,
     output_path: OUTPUT_PATH_TYPE = None,
+    draw: bool = True,
     node_color: NODE_COLOR_TYPE = None,
     node_color_aggr: COLOR_AGG_TYPE = None,
     node_cmap: CMAP_TYPE = None,
     edge_color: EDGE_COLOR_TYPE = None,
     edge_cmap: CMAP_TYPE = None,
     errors: bool = False,
-    draw: bool = True,
 ) -> DiGraph:
     """
     Create a plot of a clustering tree showing the relationship between clusterings \
@@ -47,7 +47,10 @@ def clustree(
         String indicating directory containing images. See more information on \
          files expected in directory in Notes.
     output_path : Union[str, Path], optional
-        Directory to output the final plot to.
+        Directory to output the final plot to. If None, then output not wrriten to file.
+    draw : bool, optional
+        Whether to draw the clustree. Defaults to True. If False and output_path \
+        supplied, will be overridden. Saving to file requires drawing.
     node_color : Any, optional
         For continuous colormap, use 'samples' or the name of a metadata column to \
         color nodes by. For discrete colors, use 'prefix' to color by resolution or \
@@ -72,9 +75,6 @@ def clustree(
         Whether to raise an error if an image is missing from directory supplied to
         images parameter. If False, a fake image will be created with text 'K_k' \
         where K is cluster resolution and k is cluster number. Defaults to False.
-    draw : bool, optional
-        Whether to draw the clustree. Defaults to True.
-
 
     Returns
     -------
