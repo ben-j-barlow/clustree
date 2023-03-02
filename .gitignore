@@ -1,3 +1,7 @@
+.idea/
+sandbox.*
+tests/data/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -127,3 +131,23 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+dev_notes.md
+learnings.md
+tests/data/input/1_1.png
+tests/data/input/2_1.png
+tests/data/input/2_2.png
+tests/data/input/3_1.png
+tests/data/input/3_2.png
+tests/data/input/3_3.png
+tests/data/input/edit_1_1.png
+tests/data/input/edit_2_1.png
+tests/data/input/edit_2_2.png
+tests/data/input/edit_3_1.png
+tests/data/input/edit_3_2.png
+tests/data/input/edit_3_3.png
+tests/data/input/iris.csv
+tests/data/output/test_dict.png
+tests/data/output/test_path.png
+tests/data/output/test_str.png
+.vscode/settings.json
+src/clustree/proto.ipynb
