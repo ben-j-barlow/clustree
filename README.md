@@ -25,7 +25,7 @@
 Install the package with pip:
 
 ```
-pip install clustree==0.1.6
+pip install clustree
 ```
 
 ### Quickstart
