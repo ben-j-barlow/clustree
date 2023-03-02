@@ -3,12 +3,10 @@ name = "clustree"
 version = "0.1.0"
 description = "Visualize relationship between clusterings at different resolutions"
 authors = ["Ben Barlow <ben-j-barlow.1@gmail.com>"]
-
 license = "GPL-3.0-or-later"
 readme = "README.md"
 homepage = "https://github.com/ben-j-barlow/clustree"
 repository = "https://github.com/ben-j-barlow/clustree"
-
 keywords = ["clustering", "visualization", "visualisation", "clustering-trees", "cluster-trees"]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -22,12 +20,6 @@ classifiers = [
 packages = [
     { include = "clustree", from = "src" },
 ]
-
-[tool.poetry.license]
-name = "GPL-3.0-or-later"
-spdx = "GPL-3.0-or-later"
-url = "https://www.gnu.org/licenses/gpl-3.0.en.html"
-
 
 [tool.poetry.dependencies]
 python = "^3.9"
