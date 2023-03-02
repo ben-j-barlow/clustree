@@ -7,7 +7,6 @@ from networkx import (
     multipartite_layout,
 )
 
-from clustree._handle_pars import get_and_check_cluster_cols, handle_data, handle_images
 from clustree._clustree_typing import (
     CMAP_TYPE,
     COLOR_AGG_TYPE,
@@ -18,6 +17,7 @@ from clustree._clustree_typing import (
     OUTPUT_PATH_TYPE,
 )
 from clustree._config import ClustreeConfig
+from clustree._handle_pars import get_and_check_cluster_cols, handle_data, handle_images
 
 
 def clustree(
@@ -98,7 +98,7 @@ def clustree(
 
     """
     _data = handle_data(data=data)
-    cols, kk = get_and_check_cluster_cols(cols=_data.columns, prefix=prefix)
+    kk = get_and_check_cluster_cols(cols=_data.columns, prefix=prefix)
     _images = handle_images(images=images, kk=kk, errors=errors)
     config = ClustreeConfig(
         image_cf=_images,
