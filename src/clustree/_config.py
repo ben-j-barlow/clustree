@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from clustree.clustree_typing import (
+from clustree._clustree_typing import (
     CMAP_TYPE,
     COLOR_AGG_TYPE,
     EDGE_COLOR_TYPE,
@@ -14,8 +14,8 @@ from clustree.clustree_typing import (
     NODE_COLOR_TYPE,
     NODE_CONFIG_TYPE,
 )
-from clustree.config_helpers import _data_to_color, _draw_circle
-from clustree.hash import hash_edge_id, hash_node_id
+from clustree._config_helpers import data_to_color, draw_circle
+from clustree._hash import hash_edge_id, hash_node_id
 
 control_list = ["init", "sample_info", "image", "node_color", "edge_color", "draw"]
 default_setup_config = {k: True for k in control_list}
@@ -93,7 +93,7 @@ class ClustreeConfig:
 
     def set_drawn_image(self) -> None:
         for k, v in self.node_cf.items():
-            self.node_cf[k]["image_with_drawing"] = _draw_circle(
+            self.node_cf[k]["image_with_drawing"] = draw_circle(
                 img=v["image"],
                 radius=0.1,
                 node_color=v["node_color"],
@@ -175,7 +175,7 @@ class ClustreeConfig:
                 }
 
             # convert to_parse to {node_id: color}
-            rgba, sm = _data_to_color(data=to_parse, cmap=cmap)
+            rgba, sm = data_to_color(data=to_parse, cmap=cmap)
             for k, v in rgba.items():
                 self.node_cf[k]["node_color"] = v
         else:  # fixed color, e.g., mpl.colors object
@@ -196,7 +196,7 @@ class ClustreeConfig:
             to_parse = {k: v["samples"] for k, v in self.edge_cf.items()}
 
             # convert to_parse to {edge_id: color}
-            rgba, sm = _data_to_color(data=to_parse, cmap=cmap)
+            rgba, sm = data_to_color(data=to_parse, cmap=cmap)
             for k, v in rgba.items():
                 self.edge_cf[k]["edge_color"] = v
         else:  # fixed color, e.g., mpl.colors object

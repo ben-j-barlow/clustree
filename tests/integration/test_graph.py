@@ -3,8 +3,8 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pytest
 
-from clustree.graph import clustree
-from clustree.hash import hash_node_id
+from clustree._graph import clustree
+from clustree._hash import hash_node_id
 from tests.helpers import INPUT_DIR, OUTPUT_DIR
 
 IMG_FILES = pytest.mark.datafiles(

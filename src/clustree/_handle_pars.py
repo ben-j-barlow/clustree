@@ -4,12 +4,12 @@ from typing import List
 
 import pandas as pd
 
-from clustree.clustree_typing import (
+from clustree._clustree_typing import (
     DATA_INPUT_TYPE,
     IMAGE_CONFIG_TYPE,
     IMAGE_INPUT_TYPE,
 )
-from clustree.io import read_images
+from clustree._io import read_images
 
 
 def get_img_name_pattern(kk: int) -> list[str]:

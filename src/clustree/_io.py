@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-from clustree.clustree_typing import IMAGE_CONFIG_TYPE
-from clustree.hash import hash_node_id
+from clustree._clustree_typing import IMAGE_CONFIG_TYPE
+from clustree._hash import hash_node_id
 
 
 def get_fake_img(k_upper: str, k_lower: str, w: int = 40, h: int = 40) -> np.ndarray:

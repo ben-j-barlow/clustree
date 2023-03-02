@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from clustree.hash import hash_node_id
-from clustree.io import read_images
+from clustree._hash import hash_node_id
+from clustree._io import read_images
 from tests.helpers import INPUT_DIR
 
 

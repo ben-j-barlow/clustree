@@ -8,7 +8,7 @@ from networkx import (
 )
 
 from clustree._handle_pars import get_and_check_cluster_cols, handle_data, handle_images
-from clustree.clustree_typing import (
+from clustree._clustree_typing import (
     CMAP_TYPE,
     COLOR_AGG_TYPE,
     DATA_INPUT_TYPE,
@@ -17,7 +17,7 @@ from clustree.clustree_typing import (
     NODE_COLOR_TYPE,
     OUTPUT_PATH_TYPE,
 )
-from clustree.config import ClustreeConfig
+from clustree._config import ClustreeConfig
 
 
 def clustree(
