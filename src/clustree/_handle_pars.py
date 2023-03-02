@@ -1,14 +1,16 @@
 import re
-import typing
 from collections import defaultdict
 from pathlib import Path
-from typing import List, Union
+from typing import List
 
-from clustree.clustree_typing import IMAGE_CONFIG_TYPE, IMAGE_INPUT_TYPE
+import pandas as pd
+
+from clustree.clustree_typing import (
+    DATA_INPUT_TYPE,
+    IMAGE_CONFIG_TYPE,
+    IMAGE_INPUT_TYPE,
+)
 from clustree.io import read_images
-
-if typing.TYPE_CHECKING:
-    from pandas import DataFrame
 
 
 def get_img_name_pattern(kk: int) -> list[str]:
@@ -41,41 +43,6 @@ def get_and_check_cluster_cols(cols: List[str], prefix: str) -> tuple[List[str],
     return cols, max(cols_as_int)
 
 
-def to_k_k(
-    k_upper: int, k_lower: Union[int, str, List[int], List[str]]
-) -> Union[str, List[str]]:
-    """
-    Convert from k as int to 'K_k' as str .
-    """
-    if isinstance(k_lower, (int, str)):
-        return f"{str(k_upper)}_{str(k_lower)}"
-    return [f"{str(k_upper)}_{str(ele)}" for ele in k_lower]
-
-
-def from_k_k(k_k: Union[str, List[str]]) -> Union[int, List[int]]:
-    """
-    Convert from 'K_k' as str format to k as int.
-    """
-    if isinstance(k_k, str):
-        return int(k_k[2])
-    return [int(ele[2]) for ele in k_k]
-
-
-def append_k_k_cols(data: "DataFrame", prefix: str, kk: int) -> "DataFrame":
-    """
-    Use cluster membership columns in data to produce cluster membership in form 'K_k'.
-    """
-    for k_upper in range(1, kk + 1):
-        k_upper_str = str(k_upper)
-        if f"{k_upper_str}_k" not in data.columns:
-            data.insert(
-                loc=data.shape[1],
-                column=f"{k_upper_str}_k",
-                value=to_k_k(k_upper=k_upper, k_lower=data[f"{prefix}{k_upper_str}"]),
-            )
-    return data
-
-
 def handle_images(images: IMAGE_INPUT_TYPE, errors: bool, kk: int) -> IMAGE_CONFIG_TYPE:
     if isinstance(images, (str, Path)):
         return read_images(
@@ -89,3 +56,9 @@ def handle_images(images: IMAGE_INPUT_TYPE, errors: bool, kk: int) -> IMAGE_CONF
     for key, img in images.items():
         _images[key[0]][key[2]] = img
     return _images
+
+
+def handle_data(data: DATA_INPUT_TYPE) -> pd.DataFrame:
+    if isinstance(data, (str, Path)):
+        return pd.read_csv(data)
+    return data

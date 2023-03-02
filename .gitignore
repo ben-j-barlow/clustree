@@ -1,6 +1,6 @@
 .idea/
 sandbox.*
-test_data
+tests/data/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

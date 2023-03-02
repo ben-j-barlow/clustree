@@ -5,13 +5,12 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.cm import ScalarMappable
-from PIL import Image, ImageDraw, ImageFont
 
 
-def draw_circle(
+def _draw_circle(
     img: np.ndarray,
+    node_color: str,
     radius: float = 0.1,
-    node_color: str = "red",
     img_width: int = 100,
     img_height: int = 100,
 ) -> np.ndarray:
@@ -40,14 +39,13 @@ def draw_circle(
 
 def _data_to_color(
     data: dict[int, Union[int, float]],
-    cmap: mpl.colormaps = mpl.cm.Blues,
+    cmap: mpl.colors.Colormap = mpl.cm.Blues,
     return_sm: bool = True,
 ) -> Union[
     dict[int, tuple[float, float, float, float]],
     tuple[dict[int, tuple[float, float, float, float]], ScalarMappable],
 ]:
     """
-
     Parameters
     ----------
     data

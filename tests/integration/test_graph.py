@@ -17,8 +17,10 @@ IMG_FILES = pytest.mark.datafiles(
 )
 
 
-def test_clustree(datafiles, iris_data):
-    dg = clustree(data=iris_data, prefix="K", images=INPUT_DIR, draw=False, path=None)
+def test_clustree(iris_data):
+    dg = clustree(
+        data=iris_data, prefix="K", images=INPUT_DIR, draw=False, output_path=None
+    )
 
     assert dg.number_of_edges() == 6
     assert dg.number_of_nodes() == 6
@@ -43,7 +45,7 @@ def test_clustree_draw(datafiles, iris_data):
         prefix="K",
         images=img_files,
         draw=True,
-        path=OUTPUT_DIR + "test_dict.png",
+        output_path=OUTPUT_DIR + "test_dict.png",
     )
 
     # images as str
@@ -52,7 +54,7 @@ def test_clustree_draw(datafiles, iris_data):
         prefix="K",
         images=INPUT_DIR,
         draw=True,
-        path=OUTPUT_DIR + "test_str.png",
+        output_path=OUTPUT_DIR + "test_str.png",
     )
 
     # images as path
@@ -61,5 +63,5 @@ def test_clustree_draw(datafiles, iris_data):
         prefix="K",
         images=Path(INPUT_DIR),
         draw=True,
-        path=OUTPUT_DIR + "test_path.png",
+        output_path=OUTPUT_DIR + "test_path.png",
     )

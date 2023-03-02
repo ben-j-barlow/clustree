@@ -15,7 +15,7 @@ from clustree.clustree_typing import (
     NODE_COLOR_TYPE,
     NODE_CONFIG_TYPE,
 )
-from clustree.config_helpers import _data_to_color, draw_circle
+from clustree.config_helpers import _data_to_color, _draw_circle
 
 control_list = ["init", "sample_info", "image", "node_color", "edge_color", "draw"]
 default_setup_config = {k: True for k in control_list}
@@ -107,7 +107,7 @@ class ClustreeConfig:
 
     def set_drawn_image(self) -> None:
         for k, v in self.node_cf.items():
-            self.node_cf[k]["image_with_drawing"] = draw_circle(
+            self.node_cf[k]["image_with_drawing"] = _draw_circle(
                 img=v["image"],
                 radius=0.1,
                 node_color=v["node_color"],

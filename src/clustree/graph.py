@@ -1,6 +1,3 @@
-import typing
-from typing import Union
-
 import matplotlib.pyplot as plt
 import numpy as np
 from networkx import (
@@ -10,47 +7,104 @@ from networkx import (
     multipartite_layout,
 )
 
-from clustree._handle_pars import (
-    append_k_k_cols,
-    get_and_check_cluster_cols,
-    handle_images,
-)
+from clustree._handle_pars import get_and_check_cluster_cols, handle_data, handle_images
 from clustree.clustree_typing import (
     CMAP_TYPE,
     COLOR_AGG_TYPE,
+    DATA_INPUT_TYPE,
     EDGE_COLOR_TYPE,
     IMAGE_INPUT_TYPE,
     NODE_COLOR_TYPE,
+    OUTPUT_PATH_TYPE,
 )
 from clustree.config import ClustreeConfig
 
-if typing.TYPE_CHECKING:
-    from pandas import DataFrame
-
 
 def clustree(
-    data: "DataFrame",
+    data: DATA_INPUT_TYPE,
     prefix: str,
     images: IMAGE_INPUT_TYPE,
-    errors: bool = False,
-    draw: bool = True,
-    path: Union[
-        str, None
-    ] = "/Users/benbarlow/dev/clustree/tests/data/output/mytest.png",
+    output_path: OUTPUT_PATH_TYPE = None,
     node_color: NODE_COLOR_TYPE = None,
     node_color_aggr: COLOR_AGG_TYPE = None,
     node_cmap: CMAP_TYPE = None,
     edge_color: EDGE_COLOR_TYPE = None,
     edge_cmap: CMAP_TYPE = None,
+    errors: bool = False,
+    draw: bool = True,
 ) -> DiGraph:
-    cols, kk = get_and_check_cluster_cols(cols=data.columns, prefix=prefix)
-    data = append_k_k_cols(data=data, prefix=prefix, kk=kk)
+    """
+    Create a plot of a clustering tree showing the relationship between clusterings \
+    at different resolutions.
+
+    Parameters
+    ----------
+    data : Union[str, Path, DataFrame]
+        Path of csv or DataFrame object.
+    prefix : str
+        String indicating columns containing clustering information.
+    images : Union[str, Path, dict[str, ndarray]
+        String indicating directory containing images. See more information on \
+         files expected in directory in Notes.
+    output_path : Union[str, Path], optional
+        Directory to output the final plot to.
+    node_color : Any, optional
+        For continuous colormap, use 'samples' or the name of a metadata column to \
+        color nodes by. For discrete colors, use 'prefix' to color by resolution or \
+        specify a fixed color (see Specifying colors in Matplotlib tutorial here: \
+        https://matplotlib.org/stable/tutorials/colors/colors.html).
+    node_color_aggr : Union[Callable, str], optional
+        If node_color is a column name then a function or string giving the name of a \
+        function to aggregate that column for samples in each cluster.
+    node_cmap : Union[mpl.colors.Colormap, str], optional
+        If node_color is 'samples' or a column name then a colourmap to use (see \
+        Colormap Matplotlib tutorial here: \
+        https://matplotlib.org/stable/tutorials/colors/colormaps.html).
+    edge_color : Any, optional
+        For continuous colormap, use 'samples'. For discrete colors, use 'prefix' to \
+        color by resolution or specify a fixed color (see Specifying colors in \
+        Matplotlib tutorial here: \
+        https://matplotlib.org/stable/tutorials/colors/colors.html).
+    edge_cmap : Union[mpl.colors.Colormap, str], optional
+        If edge_color is 'samples' then a colourmap to use (see Colormap Matplotlib \
+        tutorial here: https://matplotlib.org/stable/tutorials/colors/colormaps.html).
+    errors : bool, optional
+        Whether to raise an error if an image is missing from directory supplied to
+        images parameter. If False, a fake image will be created with text 'K_k' \
+        where K is cluster resolution and k is cluster number. Defaults to False.
+    draw : bool, optional
+        Whether to draw the clustree. Defaults to True.
+
+
+    Returns
+    -------
+    DiGraph
+        The directed graph that represents the clustree.
+
+    Notes
+    -------
+    The function must be supplied (a directory for) data, a prefix that indicates \
+    where to find cluster membership, and (a directory for) images.
+
+    The function that reads images from given directory will determine maximum cluster \
+    resolution kk from the data and look for files named 'K_k' with 1 <= K <= kk and, \
+    for each K, 1 <= k <= K. There are requirements on the images in the directory:
+
+        - Their file name must be K_k.png.
+        - K is cluster resolution and k is cluster number.
+        - Only .png files are accepted.
+        - If a file or more is missing, behaviour will depend on errors parameter.
+        - Other files in the directory will be ignored.
+
+    """
+    _data = handle_data(data=data)
+    cols, kk = get_and_check_cluster_cols(cols=_data.columns, prefix=prefix)
     _images = handle_images(images=images, kk=kk, errors=errors)
     config = ClustreeConfig(
         image_cf=_images,
         prefix=prefix,
         kk=kk,
-        data=data,
+        data=_data,
         node_color=node_color,
         node_color_aggr=node_color_aggr,
         node_cmap=node_cmap,
@@ -60,7 +114,7 @@ def clustree(
 
     dg = construct_clustree(cf=config)
     if draw:
-        draw_clustree(dg=dg, path=path)
+        draw_clustree(dg=dg, path=output_path)
     return dg
 
 
@@ -71,7 +125,7 @@ def construct_clustree(cf: ClustreeConfig) -> DiGraph:
     return dg
 
 
-def get_pos(dg: DiGraph) -> dict[str, np.ndarray]:
+def get_pos(dg: DiGraph) -> dict[int, np.ndarray]:
     """
     Produce position of each node. Use multipartite_layout, scale resulting positions \
     to [0, 1] interval and flip graph vertically by returning (1 - pos). This forces \
@@ -88,9 +142,7 @@ def get_pos(dg: DiGraph) -> dict[str, np.ndarray]:
 
 def draw_clustree(
     dg: DiGraph,
-    path: Union[
-        str, None
-    ] = "/Users/benbarlow/dev/clustree/tests/data/output/mytest.png",
+    path: OUTPUT_PATH_TYPE,
 ):
     pos = get_pos(dg=dg)
     draw_with_images(dg=dg, pos=pos)
@@ -100,7 +152,7 @@ def draw_clustree(
 
 def draw_with_images(
     dg: DiGraph,
-    pos: dict[str, np.ndarray],
+    pos: dict[int, np.ndarray],
     icon_size: float = 0.04,
 ):
     fig, ax = plt.subplots()
