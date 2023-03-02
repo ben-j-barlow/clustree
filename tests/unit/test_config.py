@@ -2,10 +2,10 @@ import copy
 
 import matplotlib as mpl
 import pytest
-from pairing_functions import szudzik
 
 from clustree.config import ClustreeConfig as cfg
 from clustree.config import _data_to_color, control_list
+from clustree.hash import hash_edge_id, hash_node_id
 
 test_setup_config = {k: False for k in control_list}
 
@@ -14,20 +14,20 @@ def test_init_cf(iris_data):
     setup_cf = copy.copy(test_setup_config)
     setup_cf["init"] = True
     cf = cfg(kk=3, prefix="K", data=iris_data, image_cf=None, _setup_cf=setup_cf)
-    assert cf.node_cf[cfg.hash_k_k(1, 1)]["k"] == 1
-    assert cf.node_cf[cfg.hash_k_k(1, 1)]["res"] == 1
+    assert cf.node_cf[hash_node_id(1, 1)]["k"] == 1
+    assert cf.node_cf[hash_node_id(1, 1)]["res"] == 1
 
-    assert cf.node_cf[cfg.hash_k_k(2, 1)]["k"] == 1
-    assert cf.node_cf[cfg.hash_k_k(2, 2)]["k"] == 2
-    assert cf.node_cf[cfg.hash_k_k(2, 1)]["res"] == 2
-    assert cf.node_cf[cfg.hash_k_k(2, 2)]["res"] == 2
+    assert cf.node_cf[hash_node_id(2, 1)]["k"] == 1
+    assert cf.node_cf[hash_node_id(2, 2)]["k"] == 2
+    assert cf.node_cf[hash_node_id(2, 1)]["res"] == 2
+    assert cf.node_cf[hash_node_id(2, 2)]["res"] == 2
 
-    assert cf.node_cf[cfg.hash_k_k(3, 1)]["k"] == 1
-    assert cf.node_cf[cfg.hash_k_k(3, 2)]["k"] == 2
-    assert cf.node_cf[cfg.hash_k_k(3, 3)]["k"] == 3
-    assert cf.node_cf[cfg.hash_k_k(3, 1)]["res"] == 3
-    assert cf.node_cf[cfg.hash_k_k(3, 2)]["res"] == 3
-    assert cf.node_cf[cfg.hash_k_k(3, 3)]["res"] == 3
+    assert cf.node_cf[hash_node_id(3, 1)]["k"] == 1
+    assert cf.node_cf[hash_node_id(3, 2)]["k"] == 2
+    assert cf.node_cf[hash_node_id(3, 3)]["k"] == 3
+    assert cf.node_cf[hash_node_id(3, 1)]["res"] == 3
+    assert cf.node_cf[hash_node_id(3, 2)]["res"] == 3
+    assert cf.node_cf[hash_node_id(3, 3)]["res"] == 3
 
 
 def test_set_sample_information_node(iris_data):
@@ -36,14 +36,14 @@ def test_set_sample_information_node(iris_data):
     cf = cfg(kk=3, prefix="K", data=iris_data, image_cf=None, _setup_cf=setup_cf)
     assert len(cf.node_cf) == 6
 
-    assert cf.node_cf[cfg.hash_k_k(1, 1)]["samples"] == 150
+    assert cf.node_cf[hash_node_id(1, 1)]["samples"] == 150
 
-    assert cf.node_cf[cfg.hash_k_k(2, 1)]["samples"] == 70
-    assert cf.node_cf[cfg.hash_k_k(2, 2)]["samples"] == 80
+    assert cf.node_cf[hash_node_id(2, 1)]["samples"] == 70
+    assert cf.node_cf[hash_node_id(2, 2)]["samples"] == 80
 
-    assert cf.node_cf[cfg.hash_k_k(3, 1)]["samples"] == 45
-    assert cf.node_cf[cfg.hash_k_k(3, 2)]["samples"] == 45
-    assert cf.node_cf[cfg.hash_k_k(3, 3)]["samples"] == 60
+    assert cf.node_cf[hash_node_id(3, 1)]["samples"] == 45
+    assert cf.node_cf[hash_node_id(3, 2)]["samples"] == 45
+    assert cf.node_cf[hash_node_id(3, 3)]["samples"] == 60
 
 
 def test_set_sample_information_edge(iris_data):
@@ -53,48 +53,67 @@ def test_set_sample_information_edge(iris_data):
     assert len(cf.edge_cf) == 6
 
     # samples and alpha
-    assert cf.edge_cf[cfg.hash_k_k(2, 1, 1)]["samples"] == 70
-    assert cf.edge_cf[cfg.hash_k_k(2, 2, 1)]["samples"] == 80
+    assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=1, k_start=1)]["samples"] == 70
+    assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=2, k_start=1)]["samples"] == 80
 
-    assert cf.edge_cf[cfg.hash_k_k(2, 1, 1)]["alpha"] == 1
-    assert cf.edge_cf[cfg.hash_k_k(2, 2, 1)]["alpha"] == 1
+    assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=1, k_start=1)]["alpha"] == 1
+    assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=2, k_start=1)]["alpha"] == 1
 
-    assert cf.edge_cf[cfg.hash_k_k(3, 1, 1)]["samples"] == 45
-    assert cf.edge_cf[cfg.hash_k_k(3, 2, 1)]["samples"] == 25
-    assert cf.edge_cf[cfg.hash_k_k(3, 2, 2)]["samples"] == 20
-    assert cf.edge_cf[cfg.hash_k_k(3, 3, 2)]["samples"] == 60
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=1, k_start=1)]["samples"] == 45
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=1)]["samples"] == 25
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=2)]["samples"] == 20
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=3, k_start=2)]["samples"] == 60
 
-    assert cf.edge_cf[cfg.hash_k_k(3, 1, 1)]["alpha"] == 1
-    assert cf.edge_cf[cfg.hash_k_k(3, 2, 1)]["alpha"] == 5 / 9
-    assert cf.edge_cf[cfg.hash_k_k(3, 2, 2)]["alpha"] == 4 / 9
-    assert cf.edge_cf[cfg.hash_k_k(3, 3, 2)]["alpha"] == 1
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=1, k_start=1)]["alpha"] == 1
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=1)]["alpha"] == 5 / 9
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=2)]["alpha"] == 4 / 9
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=3, k_start=2)]["alpha"] == 1
 
     # start and end
-    assert cf.edge_cf[cfg.hash_k_k(2, 2, 1)]["start"] == cfg.hash_k_k(1, 1)
-    assert cf.edge_cf[cfg.hash_k_k(2, 1, 1)]["end"] == cfg.hash_k_k(2, 1)
+    assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=2, k_start=1)][
+        "start"
+    ] == hash_node_id(1, 1)
+    assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=1, k_start=1)][
+        "end"
+    ] == hash_node_id(2, 1)
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=1, k_start=1)][
+        "end"
+    ] == hash_node_id(3, 1)
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=1)][
+        "end"
+    ] == hash_node_id(3, 2)
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=2)][
+        "end"
+    ] == hash_node_id(3, 2)
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=3, k_start=2)][
+        "end"
+    ] == hash_node_id(3, 3)
 
-    assert cf.edge_cf[cfg.hash_k_k(3, 1, 1)]["end"] == cfg.hash_k_k(3, 1)
-    assert cf.edge_cf[cfg.hash_k_k(3, 2, 1)]["end"] == cfg.hash_k_k(3, 2)
-    assert cf.edge_cf[cfg.hash_k_k(3, 2, 2)]["end"] == cfg.hash_k_k(3, 2)
-    assert cf.edge_cf[cfg.hash_k_k(3, 3, 2)]["end"] == cfg.hash_k_k(3, 3)
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=1, k_start=1)][
+        "start"
+    ] == hash_node_id(2, 1)
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=1)][
+        "start"
+    ] == hash_node_id(2, 1)
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=2)][
+        "start"
+    ] == hash_node_id(2, 2)
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=3, k_start=2)][
+        "start"
+    ] == hash_node_id(2, 2)
 
-    assert cf.edge_cf[cfg.hash_k_k(3, 1, 1)]["start"] == cfg.hash_k_k(2, 1)
-    assert cf.edge_cf[cfg.hash_k_k(3, 2, 1)]["start"] == cfg.hash_k_k(2, 1)
-    assert cf.edge_cf[cfg.hash_k_k(3, 2, 2)]["start"] == cfg.hash_k_k(2, 2)
-    assert cf.edge_cf[cfg.hash_k_k(3, 3, 2)]["start"] == cfg.hash_k_k(2, 2)
+    assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=1, k_start=1)]["alpha"] == 1
+    assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=2, k_start=1)]["alpha"] == 1
 
-    assert cf.edge_cf[cfg.hash_k_k(2, 1, 1)]["alpha"] == 1
-    assert cf.edge_cf[cfg.hash_k_k(2, 2, 1)]["alpha"] == 1
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=1, k_start=1)]["samples"] == 45
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=1)]["samples"] == 25
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=2)]["samples"] == 20
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=3, k_start=2)]["samples"] == 60
 
-    assert cf.edge_cf[cfg.hash_k_k(3, 1, 1)]["samples"] == 45
-    assert cf.edge_cf[cfg.hash_k_k(3, 2, 1)]["samples"] == 25
-    assert cf.edge_cf[cfg.hash_k_k(3, 2, 2)]["samples"] == 20
-    assert cf.edge_cf[cfg.hash_k_k(3, 3, 2)]["samples"] == 60
-
-    assert cf.edge_cf[cfg.hash_k_k(3, 1, 1)]["alpha"] == 1
-    assert cf.edge_cf[cfg.hash_k_k(3, 2, 1)]["alpha"] == 5 / 9
-    assert cf.edge_cf[cfg.hash_k_k(3, 2, 2)]["alpha"] == 4 / 9
-    assert cf.edge_cf[cfg.hash_k_k(3, 3, 2)]["alpha"] == 1
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=1, k_start=1)]["alpha"] == 1
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=1)]["alpha"] == 5 / 9
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=2)]["alpha"] == 4 / 9
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=3, k_start=2)]["alpha"] == 1
 
 
 def test_set_node_color_prefix(iris_data):
@@ -128,7 +147,7 @@ def test_set_node_color_samples(iris_data):
     # produce expected
     kk = 3
     node_id = [
-        cfg.hash_k_k(k_upper=k_upper, k_lower=k_lower)
+        hash_node_id(k_upper=k_upper, k_lower=k_lower)
         for k_upper in range(1, kk + 1)
         for k_lower in range(1, k_upper + 1)
     ]
@@ -152,7 +171,7 @@ def test_set_node_color_agg(iris_data):
     # produce expected
     kk = 3
     node_id = [
-        cfg.hash_k_k(k_upper=k_upper, k_lower=k_lower)
+        hash_node_id(k_upper=k_upper, k_lower=k_lower)
         for k_upper in range(1, kk + 1)
         for k_lower in range(1, k_upper + 1)
     ]
@@ -264,12 +283,12 @@ def test_set_edge_color_samples(iris_data):
     )
     act_color = [v["edge_color"] for k, v in cf.edge_cf.items()]
     edge_id = [
-        cfg.hash_k_k(k_upper=2, k_lower=1, k_start=1),
-        cfg.hash_k_k(k_upper=2, k_lower=2, k_start=1),
-        cfg.hash_k_k(k_upper=3, k_lower=1, k_start=1),
-        cfg.hash_k_k(k_upper=3, k_lower=2, k_start=1),
-        cfg.hash_k_k(k_upper=3, k_lower=2, k_start=2),
-        cfg.hash_k_k(k_upper=3, k_lower=3, k_start=2),
+        hash_edge_id(k_upper=2, k_end=1, k_start=1),
+        hash_edge_id(k_upper=2, k_end=2, k_start=1),
+        hash_edge_id(k_upper=3, k_end=1, k_start=1),
+        hash_edge_id(k_upper=3, k_end=2, k_start=1),
+        hash_edge_id(k_upper=3, k_end=2, k_start=2),
+        hash_edge_id(k_upper=3, k_end=3, k_start=2),
     ]
 
     samples = [70, 80, 45, 25, 20, 60]
@@ -300,8 +319,3 @@ def test_set_edge_color_fixed(iris_data):
     act_color = [v["edge_color"] for k, v in cf.edge_cf.items()]
     assert all([isinstance(v["edge_color"], str) for k, v in cf.edge_cf.items()])
     assert act_color == ["C1" for _ in range(6)]
-
-
-def test_hash_k_k():
-    assert szudzik.pair(1, 2, 3) == cfg.hash_k_k(1, 2, 3)
-    assert szudzik.pair(1, 2) == cfg.hash_k_k(1, 2)

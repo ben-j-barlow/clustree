@@ -3,8 +3,8 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pytest
 
-from clustree.config import ClustreeConfig as cfg
 from clustree.graph import clustree
+from clustree.hash import hash_node_id
 from tests.helpers import INPUT_DIR, OUTPUT_DIR
 
 IMG_FILES = pytest.mark.datafiles(
@@ -25,12 +25,12 @@ def test_clustree(iris_data):
     assert dg.number_of_edges() == 6
     assert dg.number_of_nodes() == 6
     assert set(dg.edges) == {
-        (cfg.hash_k_k(1, 1), cfg.hash_k_k(2, 1)),
-        (cfg.hash_k_k(1, 1), cfg.hash_k_k(2, 2)),
-        (cfg.hash_k_k(2, 1), cfg.hash_k_k(3, 1)),
-        (cfg.hash_k_k(2, 1), cfg.hash_k_k(3, 2)),
-        (cfg.hash_k_k(2, 2), cfg.hash_k_k(3, 2)),
-        (cfg.hash_k_k(2, 2), cfg.hash_k_k(3, 3)),
+        (hash_node_id(1, 1), hash_node_id(2, 1)),
+        (hash_node_id(1, 1), hash_node_id(2, 2)),
+        (hash_node_id(2, 1), hash_node_id(3, 1)),
+        (hash_node_id(2, 1), hash_node_id(3, 2)),
+        (hash_node_id(2, 2), hash_node_id(3, 2)),
+        (hash_node_id(2, 2), hash_node_id(3, 3)),
     }
 
 

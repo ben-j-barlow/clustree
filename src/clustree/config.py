@@ -1,10 +1,9 @@
 from collections import defaultdict
-from typing import Any, List, Optional, Union
+from typing import Any, Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from pairing_functions import szudzik
 
 from clustree.clustree_typing import (
     CMAP_TYPE,
@@ -16,6 +15,7 @@ from clustree.clustree_typing import (
     NODE_CONFIG_TYPE,
 )
 from clustree.config_helpers import _data_to_color, _draw_circle
+from clustree.hash import hash_edge_id, hash_node_id
 
 control_list = ["init", "sample_info", "image", "node_color", "edge_color", "draw"]
 default_setup_config = {k: True for k in control_list}
@@ -77,32 +77,21 @@ class ClustreeConfig:
         if _setup_cf["draw"]:
             self.set_drawn_image()
 
-    @classmethod
-    def hash_k_k(
-        cls, k_upper: int, k_lower: Union[int, List[int]], k_start: Optional[int] = None
-    ) -> Union[int, List[int]]:
-        if k_start:
-            return szudzik.pair(k_upper, k_lower, k_start)
-        if isinstance(k_lower, list):
-            return [szudzik.pair(k_upper, ele) for ele in k_lower]
-        return szudzik.pair(k_upper, k_lower)
-
     def init_cf(self) -> None:
         for k_upper in range(1, self.kk + 1):
             for k_lower in range(1, k_upper + 1):
-                ind = ClustreeConfig.hash_k_k(k_upper=k_upper, k_lower=k_lower)
+                ind = hash_node_id(k_upper=k_upper, k_lower=k_lower)
                 self.node_cf[ind].update({"k": k_lower, "res": k_upper})
-            self.k_upper_to_node_id[k_upper] = ClustreeConfig.hash_k_k(
-                k_upper=k_upper, k_lower=list(range(1, k_upper + 1))
-            )
+            self.k_upper_to_node_id[k_upper] = [
+                hash_node_id(k_upper=k_upper, k_lower=ele)
+                for ele in list(range(1, k_upper + 1))
+            ]
 
     def set_image(self, image_cf: IMAGE_CONFIG_TYPE) -> None:
         for k_upper, v in image_cf.items():
             for k_lower, img in v.items():
                 # convert str to int
-                ind = ClustreeConfig.hash_k_k(
-                    k_upper=int(k_upper), k_lower=int(k_lower)
-                )
+                ind = hash_node_id(k_upper=int(k_upper), k_lower=int(k_lower))
                 self.node_cf[ind]["image"] = img
 
     def set_drawn_image(self) -> None:
@@ -131,9 +120,7 @@ class ClustreeConfig:
             vals, counts = np.unique(data[:, col], return_counts=True)
             for k_end, node_samples in zip(vals, counts):
                 # get #samples at each node
-                end_hashed = ClustreeConfig.hash_k_k(
-                    k_upper=k_upper, k_lower=int(k_end)
-                )
+                end_hashed = hash_node_id(k_upper=k_upper, k_lower=int(k_end))
                 self.node_cf[end_hashed]["samples"] = int(node_samples)
 
                 if k_upper > 1:
@@ -142,13 +129,13 @@ class ClustreeConfig:
                     to_count = data[ind, col - 1]
                     vals, counts = np.unique(to_count, return_counts=True)
                     for k_start, edge_samples in zip(vals, counts):
-                        start_hashed = ClustreeConfig.hash_k_k(
+                        start_hashed = hash_node_id(
                             k_upper=k_upper - 1, k_lower=int(k_start)
                         )
                         self.edge_cf[
-                            ClustreeConfig.hash_k_k(
+                            hash_edge_id(
                                 k_upper=k_upper,
-                                k_lower=int(k_end),
+                                k_end=int(k_end),
                                 k_start=int(k_start),
                             )
                         ].update(
@@ -182,9 +169,7 @@ class ClustreeConfig:
                         "Cannot calculate node color without aggregate function"
                     )
                 to_parse = {
-                    ClustreeConfig.hash_k_k(k_upper=k_upper, k_lower=k_lower): float(
-                        val
-                    )
+                    hash_node_id(k_upper=k_upper, k_lower=k_lower): float(val)
                     for k_upper, cluster_col in enumerate(self.membership_cols, 1)
                     for k_lower, val in data.groupby(cluster_col)[node_color]
                     .agg(aggr)
