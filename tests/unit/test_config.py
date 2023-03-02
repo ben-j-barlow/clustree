@@ -3,9 +3,9 @@ import copy
 import matplotlib as mpl
 import pytest
 
-from clustree.config import ClustreeConfig as cfg
-from clustree.config import _data_to_color, control_list
-from clustree.hash import hash_edge_id, hash_node_id
+from clustree._config import ClustreeConfig as cfg
+from clustree._config import control_list, data_to_color
+from clustree._hash import hash_edge_id, hash_node_id
 
 test_setup_config = {k: False for k in control_list}
 
@@ -152,7 +152,7 @@ def test_set_node_color_samples(iris_data):
         for k_lower in range(1, k_upper + 1)
     ]
     samples = [150, 70, 80, 45, 45, 60]
-    exp_color = _data_to_color(
+    exp_color = data_to_color(
         data={k: v for k, v in zip(node_id, samples)},
         cmap=mpl.cm.Blues,
         return_sm=False,
@@ -176,7 +176,7 @@ def test_set_node_color_agg(iris_data):
         for k_lower in range(1, k_upper + 1)
     ]
     agg_res = [876.5, 369.8, 506.7, 225.5, 265.2, 385.8]
-    exp_color = _data_to_color(
+    exp_color = data_to_color(
         data={k: v for k, v in zip(node_id, agg_res)},
         cmap=mpl.cm.Blues,
         return_sm=False,
@@ -293,7 +293,7 @@ def test_set_edge_color_samples(iris_data):
 
     samples = [70, 80, 45, 25, 20, 60]
 
-    exp_color = _data_to_color(
+    exp_color = data_to_color(
         data={k: v for k, v in zip(edge_id, samples)},
         cmap=mpl.cm.Reds,
         return_sm=False,

@@ -7,7 +7,7 @@ import numpy as np
 from matplotlib.cm import ScalarMappable
 
 
-def _draw_circle(
+def draw_circle(
     img: np.ndarray,
     node_color: str,
     radius: float = 0.1,
@@ -37,7 +37,7 @@ def _draw_circle(
         return to_return
 
 
-def _data_to_color(
+def data_to_color(
     data: dict[int, Union[int, float]],
     cmap: mpl.colors.Colormap = mpl.cm.Blues,
     return_sm: bool = True,

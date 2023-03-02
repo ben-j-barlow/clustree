@@ -1,6 +1,6 @@
 import numpy as np
 
-from clustree.graph import clustree
+from clustree._graph import clustree
 from tests.helpers import INPUT_DIR, OUTPUT_DIR, add_title_to_fig
 
 

@@ -1,6 +1,6 @@
 from pairing_functions import szudzik
 
-from clustree.hash import hash_edge_id, hash_node_id
+from clustree._hash import hash_edge_id, hash_node_id
 
 
 def test_hash_node_id():
