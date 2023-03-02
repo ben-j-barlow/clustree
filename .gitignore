@@ -1,6 +1,7 @@
 .idea/
 sandbox.*
 tests/data/*
+proto.ipynb
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -150,4 +151,4 @@ tests/data/output/test_dict.png
 tests/data/output/test_path.png
 tests/data/output/test_str.png
 .vscode/settings.json
-src/clustree/proto.ipynb
+proto.ipynb
