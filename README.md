@@ -16,7 +16,7 @@
 * Legend for continuous colormaps.
 * Reingold-Tilford algorithm to minimise crossing edges.
 * Allow PDF inputs.
-* More, I'm sure!
+* Much more! Early testing will help prioritise future development.
 
 ## Usage
 
@@ -56,6 +56,12 @@ def clustree(
 * `edge_cmap`: If edge_color is 'samples' then a colourmap to use (see Colormap Matplotlib tutorial here: https://matplotlib.org/stable/tutorials/colors/colormaps.html).
 * `errors`: Whether to raise an error if an image is missing from directory supplied to images parameter. If False, a fake image will be created with text 'K_k' where K is cluster resolution and k is cluster number. Defaults to False.
 
+## Glossary
+
+* *cluster resolution*: Upper case `K`. For example, at cluster resolution `K=2` data is clustered into 2 distinct clusters.
+* *cluster number*: Lower case `k`. For example, at cluster resolution 2 data is clustered into 2 distinct clusters `k=1` and `k=2`.
+* *kk*: highest value of `K` (cluster resolution) shown in clustree.
+* *cluster membership*: The association between data points and cluster numbers for fixed cluster resolution. For example, `[1, 1, 2, 2, 2]` would mean the first 2 data points belong to cluster number `1` and the following 3 data points belong to cluster number `2`.
 
 ## Contributing
 
