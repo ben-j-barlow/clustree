@@ -88,11 +88,8 @@ class ClustreeConfig:
             ]
 
     def set_image(self, image_cf: IMAGE_CONFIG_TYPE) -> None:
-        for k_upper, v in image_cf.items():
-            for k_lower, img in v.items():
-                # convert str to int
-                ind = hash_node_id(k_upper=int(k_upper), k_lower=int(k_lower))
-                self.node_cf[ind]["image"] = img
+        for node_id, img in image_cf.items():
+            self.node_cf[node_id]["image"] = image_cf[node_id]
 
     def set_drawn_image(self) -> None:
         for k, v in self.node_cf.items():

@@ -50,12 +50,7 @@ def handle_images(images: IMAGE_INPUT_TYPE, errors: bool, kk: int) -> IMAGE_CONF
             path=images,
             errors=errors,
         )
-
-    # isinstance(images, dict)
-    _images = defaultdict(dict)
-    for key, img in images.items():
-        _images[key[0]][key[2]] = img
-    return _images
+    return images
 
 
 def handle_data(data: DATA_INPUT_TYPE) -> pd.DataFrame:

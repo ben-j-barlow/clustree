@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
+from clustree.hash import hash_node_id
 from clustree.io import read_images
 from tests.helpers import INPUT_DIR
 
@@ -11,11 +12,12 @@ from tests.helpers import INPUT_DIR
 def test_read_images():
     # Test case 1: path to existing directory, errors = True
     path = INPUT_DIR
+    node_id = hash_node_id(1, 1)
+
     out = read_images(to_read=["1_1.png"], path=path)
-    exp = {"1": {"1": plt.imread(Path(path + "1_1.png"))}}
+    exp = {node_id: plt.imread(Path(path + "1_1.png"))}
     assert out.keys() == exp.keys()
-    assert out["1"].keys() == exp["1"].keys()
-    assert np.array_equal(out["1"]["1"], exp["1"]["1"])
+    assert np.array_equal(out[node_id], exp[node_id])
 
     # Test case 2: path to non-existing directory
     with pytest.raises(FileNotFoundError):
@@ -29,24 +31,20 @@ def test_read_images():
         to_read=["1_1.png", "2_1.png", "2_2.png"], path=path, errors=False
     )
     exp = {
-        "1": {"1": plt.imread(Path(path + "1_1.png"))},
-        "2": {
-            "1": plt.imread(Path(path + "2_1.png")),
-            "2": plt.imread(Path(path + "2_2.png")),
-        },
+        hash_node_id(1, 1): plt.imread(Path(path + "1_1.png")),
+        hash_node_id(2, 1): plt.imread(Path(path + "2_1.png")),
+        hash_node_id(2, 2): plt.imread(Path(path + "2_2.png")),
     }
     assert out.keys() == exp.keys()
-    assert out["1"].keys() == exp["1"].keys()
-    assert out["2"].keys() == exp["2"].keys()
-    assert np.array_equal(out["1"]["1"], exp["1"]["1"])
-    assert np.array_equal(out["2"]["1"], exp["2"]["1"])
-    assert np.array_equal(out["2"]["2"], exp["2"]["2"])
+
+    keys = list(out.keys())
+    assert np.array_equal(out[keys[0]], exp[keys[0]])
+    assert np.array_equal(out[keys[1]], exp[keys[1]])
+    assert np.array_equal(out[keys[2]], exp[keys[2]])
 
     # Test case 4: pathlib.Path object, errors = True
     out = read_images(to_read=["1_1.png", "2_1.png", "2_2.png"], path=Path(path))
     assert out.keys() == exp.keys()
-    assert out["1"].keys() == exp["1"].keys()
-    assert out["2"].keys() == exp["2"].keys()
-    assert np.array_equal(out["1"]["1"], exp["1"]["1"])
-    assert np.array_equal(out["2"]["1"], exp["2"]["1"])
-    assert np.array_equal(out["2"]["2"], exp["2"]["2"])
+    assert np.array_equal(out[keys[0]], exp[keys[0]])
+    assert np.array_equal(out[keys[1]], exp[keys[1]])
+    assert np.array_equal(out[keys[2]], exp[keys[2]])

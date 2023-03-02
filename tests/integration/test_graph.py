@@ -37,7 +37,10 @@ def test_clustree(iris_data):
 @IMG_FILES
 def test_clustree_draw(datafiles, iris_data):
     to_read = [Path(ele) for ele in datafiles.listdir()]
-    img_files = {file.stem: plt.imread(file) for file in to_read}
+    img_files = {
+        hash_node_id(int(file.stem[0]), int(file.stem[2])): plt.imread(file)
+        for file in to_read
+    }
 
     # images as dict
     clustree(
