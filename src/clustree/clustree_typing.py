@@ -17,13 +17,11 @@ EDGE_CONFIG_TYPE = [
     dict[str, Any],  # 'color', 'samples', 'alpha', 'start', 'end', 'res'
 ]
 
-# TODO: change to int by changing code throughout repo
 IMAGE_CONFIG_TYPE = dict[int, np.ndarray]
 
 DATA_INPUT_TYPE = Union[str, Path, pd.DataFrame]
 IMAGE_INPUT_TYPE = Union[str, Path, IMAGE_CONFIG_TYPE]
 
-# TODO: improve typing for node_color
 NODE_COLOR_TYPE = Any  # e.g. 'samples', 'K', data col name
 EDGE_COLOR_TYPE = Any
 COLOR_AGG_TYPE = Optional[Union[Callable, str]]

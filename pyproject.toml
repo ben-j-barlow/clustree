@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "clustree"
-version = "0.1.0"
+version = "0.1.6"
 description = "Visualize relationship between clusterings at different resolutions"
 authors = ["Ben Barlow <ben-j-barlow.1@gmail.com>"]
 license = "GPL-3.0-or-later"
@@ -23,18 +23,18 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.9"
-pandas = "^1.5.3"
-networkx = "^3.0"
-matplotlib = "^3.6.3"
-pairing-functions = "^0.2.1"
+pandas = "^1.5"
+networkx = "^3"
+matplotlib = "^3.6"
+pairing-functions = "0.2.1"
 
 [tool.poetry.group.dev.dependencies]
-black = "^22.12.0"
-isort = "^5.11.4"
-flake8 = "^6.0.0"
+black = "^22"
+isort = "^5"
+flake8 = "^6"
 jupyter = "^1.0.0"
-pytest-datafiles = "^2.0.1"
-pytest = "^7.2.1"
+pytest-datafiles = "^2"
+pytest = "^7"
 
 [build-system]
 requires = ["poetry-core"]
