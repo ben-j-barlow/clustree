@@ -59,10 +59,10 @@ def clustree(
 * `images`: String indicating directory containing images. See more information on files expected in directory in Notes.
 * `output_path`: Directory to output the final plot to. If None, then output not wrriten to file.
 * `draw`: Whether to draw the clustree. Defaults to True. If False and output_path supplied, will be overridden. Saving to file requires drawing.
-* `node_color`: For continuous colormap, use 'samples' or the name of a metadata column to color nodes by. For discrete colors, use 'prefix' to color by resolution or specify a fixed color (see Specifying colors in Matplotlib tutorial here: https://matplotlib.org/stable/tutorials/colors/colors.html).
+* `node_color`: For continuous colormap, use 'samples' or the name of a metadata column to color nodes by. For discrete colors, use 'prefix' to color by resolution or specify a fixed color (see Specifying colors in Matplotlib tutorial here: https://matplotlib.org/stable/tutorials/colors/colors.html).  If None, default set equal to value of prefix to color by resolution.
 * `node_color_aggr`: If node_color is a column name then a function or string giving the name of a function to aggregate that column for samples in each cluster.
 * `node_cmap`: If node_color is 'samples' or a column name then a colourmap to use (see Colormap Matplotlib tutorial here: https://matplotlib.org/stable/tutorials/colors/colormaps.html).
-* `edge_color`: For continuous colormap, use 'samples'. For discrete colors, use 'prefix' to color by resolution or specify a fixed color (see Specifying colors in Matplotlib tutorial here: https://matplotlib.org/stable/tutorials/colors/colors.html).
+* `edge_color`: For continuous colormap, use 'samples'. For discrete colors, use 'prefix' to color by resolution or specify a fixed color (see Specifying colors in Matplotlib tutorial here: https://matplotlib.org/stable/tutorials/colors/colors.html). If None, default set to 'samples'.
 * `edge_cmap`: If edge_color is 'samples' then a colourmap to use (see Colormap Matplotlib tutorial here: https://matplotlib.org/stable/tutorials/colors/colormaps.html).
 * `errors`: Whether to raise an error if an image is missing from directory supplied to images parameter. If False, a fake image will be created with text 'K_k' where K is cluster resolution and k is cluster number. Defaults to False.
 
@@ -72,11 +72,3 @@ def clustree(
 * *cluster number*: Lower case `k`. For example, at cluster resolution 2 data is clustered into 2 distinct clusters `k=1` and `k=2`.
 * *kk*: highest value of `K` (cluster resolution) shown in clustree.
 * *cluster membership*: The association between data points and cluster numbers for fixed cluster resolution. For example, `[1, 1, 2, 2, 2]` would mean the first 2 data points belong to cluster number `1` and the following 3 data points belong to cluster number `2`.
-
-## Contributing
-
-* python -m flake8 src --max-line-length=88
-* python -m flake8 tests --max-line-length=88
-* python -m pytest .
-* black .
-* isort .
