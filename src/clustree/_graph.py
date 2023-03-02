@@ -26,10 +26,10 @@ def clustree(
     images: IMAGE_INPUT_TYPE,
     output_path: OUTPUT_PATH_TYPE = None,
     draw: bool = True,
-    node_color: NODE_COLOR_TYPE = None,
+    node_color: NODE_COLOR_TYPE = None,  # if None, set equal to prefix
     node_color_aggr: COLOR_AGG_TYPE = None,
     node_cmap: CMAP_TYPE = None,
-    edge_color: EDGE_COLOR_TYPE = None,
+    edge_color: EDGE_COLOR_TYPE = "samples",
     edge_cmap: CMAP_TYPE = None,
     errors: bool = False,
 ) -> DiGraph:
@@ -53,9 +53,11 @@ def clustree(
         supplied, will be overridden. Saving to file requires drawing.
     node_color : Any, optional
         For continuous colormap, use 'samples' or the name of a metadata column to \
-        color nodes by. For discrete colors, use 'prefix' to color by resolution or \
-        specify a fixed color (see Specifying colors in Matplotlib tutorial here: \
-        https://matplotlib.org/stable/tutorials/colors/colors.html).
+        color nodes by. For discrete colors, parse the same value parsed to prefix to \
+        color by resolution or specify a fixed color (see Specifying colors in \
+        Matplotlib tutorial here: \
+        https://matplotlib.org/stable/tutorials/colors/colors.html). If None, default \
+        set equal to value of prefix to color by resolution.
     node_color_aggr : Union[Callable, str], optional
         If node_color is a column name then a function or string giving the name of a \
         function to aggregate that column for samples in each cluster.
@@ -67,7 +69,8 @@ def clustree(
         For continuous colormap, use 'samples'. For discrete colors, use 'prefix' to \
         color by resolution or specify a fixed color (see Specifying colors in \
         Matplotlib tutorial here: \
-        https://matplotlib.org/stable/tutorials/colors/colors.html).
+        https://matplotlib.org/stable/tutorials/colors/colors.html). If None, default \
+        set to 'samples'.
     edge_cmap : Union[mpl.colors.Colormap, str], optional
         If edge_color is 'samples' then a colourmap to use (see Colormap Matplotlib \
         tutorial here: https://matplotlib.org/stable/tutorials/colors/colormaps.html).
