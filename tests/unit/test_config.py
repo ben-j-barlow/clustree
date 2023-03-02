@@ -148,16 +148,6 @@ def test_set_node_color_samples(iris_data):
 def test_set_node_color_agg(iris_data):
     setup_cf = test_setup_config
     setup_cf.update({"sample_info": True, "node_color": True})
-    cf = cfg(
-        kk=3,
-        prefix="K",
-        data=iris_data,
-        image_cf=None,
-        _setup_cf=setup_cf,
-        node_color="sepal_length",
-        node_color_aggr=sum,
-        node_cmap=mpl.cm.Blues,
-    )
 
     # produce expected
     kk = 3
@@ -173,7 +163,32 @@ def test_set_node_color_agg(iris_data):
         return_sm=False,
     )
 
-    # actual
+    # actual: with agg as callable
+    cf = cfg(
+        kk=3,
+        prefix="K",
+        data=iris_data,
+        image_cf=None,
+        _setup_cf=setup_cf,
+        node_color="sepal_length",
+        node_color_aggr=sum,
+        node_cmap=mpl.cm.Blues,
+    )
+    act_color = {k: v["node_color"] for k, v in cf.node_cf.items()}
+    assert all([isinstance(v["node_color"], tuple) for k, v in cf.node_cf.items()])
+    assert exp_color == act_color
+
+    # actual: with agg as str
+    cf = cfg(
+        kk=3,
+        prefix="K",
+        data=iris_data,
+        image_cf=None,
+        _setup_cf=setup_cf,
+        node_color="sepal_length",
+        node_color_aggr="sum",
+        node_cmap=mpl.cm.Blues,
+    )
     act_color = {k: v["node_color"] for k, v in cf.node_cf.items()}
     assert all([isinstance(v["node_color"], tuple) for k, v in cf.node_cf.items()])
     assert exp_color == act_color
