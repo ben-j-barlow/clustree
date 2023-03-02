@@ -4,7 +4,7 @@ import matplotlib as mpl
 import pytest
 
 from clustree._config import ClustreeConfig as cfg
-from clustree._config import data_to_color, control_list
+from clustree._config import control_list, data_to_color
 from clustree._hash import hash_edge_id, hash_node_id
 
 test_setup_config = {k: False for k in control_list}
