@@ -35,7 +35,8 @@ def read_images(
     to_return = dict()
 
     for file in to_read:
-        node_id = hash_node_id(k_upper=int(file[0]), k_lower=int(file[2]))
+        k_upper, k_lower = tuple(file.split(".")[0].split("_"))
+        node_id = hash_node_id(k_upper=int(k_upper), k_lower=int(k_lower))
         try:
             to_return[node_id] = plt.imread(Path(path / file))
         except FileNotFoundError as err:
