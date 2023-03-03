@@ -4,14 +4,14 @@ import matplotlib as mpl
 import pytest
 
 from clustree._config import ClustreeConfig as cfg
-from clustree._config import control_list, data_to_color
+from clustree._config import CONTROL_LIST, data_to_color
 from clustree._hash import hash_edge_id, hash_node_id
 
-test_setup_config = {k: False for k in control_list}
+DEFAULT_CONFIG = {k: False for k in CONTROL_LIST}
 
 
 def test_init_cf(iris_data):
-    setup_cf = copy.copy(test_setup_config)
+    setup_cf = DEFAULT_CONFIG
     setup_cf["init"] = True
     cf = cfg(kk=3, prefix="K", data=iris_data, image_cf=None, _setup_cf=setup_cf)
     assert cf.node_cf[hash_node_id(1, 1)]["k"] == 1
@@ -31,7 +31,7 @@ def test_init_cf(iris_data):
 
 
 def test_set_sample_information_node(iris_data):
-    setup_cf = test_setup_config
+    setup_cf = DEFAULT_CONFIG
     setup_cf["sample_info"] = True
     cf = cfg(kk=3, prefix="K", data=iris_data, image_cf=None, _setup_cf=setup_cf)
     assert len(cf.node_cf) == 6
@@ -47,7 +47,7 @@ def test_set_sample_information_node(iris_data):
 
 
 def test_set_sample_information_edge(iris_data):
-    setup_cf = test_setup_config
+    setup_cf = DEFAULT_CONFIG
     setup_cf["sample_info"] = True
     cf = cfg(kk=3, prefix="K", data=iris_data, image_cf=None, _setup_cf=setup_cf)
     assert len(cf.edge_cf) == 6
@@ -117,7 +117,7 @@ def test_set_sample_information_edge(iris_data):
 
 
 def test_set_node_color_prefix(iris_data):
-    setup_cf = test_setup_config
+    setup_cf = DEFAULT_CONFIG
     setup_cf.update({"init": True, "node_color": True})
     cf = cfg(
         kk=3,
@@ -132,7 +132,7 @@ def test_set_node_color_prefix(iris_data):
 
 
 def test_set_node_color_samples(iris_data):
-    setup_cf = test_setup_config
+    setup_cf = DEFAULT_CONFIG
     setup_cf.update({"sample_info": True, "node_color": True})
     cf = cfg(
         kk=3,
@@ -165,7 +165,7 @@ def test_set_node_color_samples(iris_data):
 
 
 def test_set_node_color_agg(iris_data):
-    setup_cf = test_setup_config
+    setup_cf = DEFAULT_CONFIG
     setup_cf.update({"sample_info": True, "node_color": True})
 
     # produce expected
@@ -214,7 +214,7 @@ def test_set_node_color_agg(iris_data):
 
 
 def test_set_node_color_no_agg_chosen(iris_data):
-    setup_cf = test_setup_config
+    setup_cf = DEFAULT_CONFIG
     setup_cf.update({"sample_info": True, "node_color": True})
     with pytest.raises(ValueError):
         cf = cfg(
@@ -240,7 +240,7 @@ def test_set_node_color_no_agg_chosen(iris_data):
 
 
 def test_set_node_color_fixed(iris_data):
-    setup_cf = test_setup_config
+    setup_cf = DEFAULT_CONFIG
     setup_cf.update({"sample_info": True, "node_color": True})
     cf = cfg(
         kk=3,
@@ -256,7 +256,7 @@ def test_set_node_color_fixed(iris_data):
 
 
 def test_set_edge_color_prefix(iris_data):
-    setup_cf = test_setup_config
+    setup_cf = DEFAULT_CONFIG
     setup_cf.update({"sample_info": True, "edge_color": True})
     cf = cfg(
         kk=3,
@@ -271,7 +271,7 @@ def test_set_edge_color_prefix(iris_data):
 
 
 def test_set_edge_color_samples(iris_data):
-    setup_cf = test_setup_config
+    setup_cf = DEFAULT_CONFIG
     setup_cf.update({"sample_info": True, "edge_color": True})
     cf = cfg(
         kk=3,
@@ -306,7 +306,7 @@ def test_set_edge_color_samples(iris_data):
 
 
 def test_set_edge_color_fixed(iris_data):
-    setup_cf = test_setup_config
+    setup_cf = DEFAULT_CONFIG
     setup_cf.update({"sample_info": True, "edge_color": True})
     cf = cfg(
         kk=3,
