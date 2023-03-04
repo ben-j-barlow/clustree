@@ -116,7 +116,7 @@ def clustree(
     )
 
     dg = construct_clustree(cf=config)
-    if draw:
+    if draw or output_path:
         draw_clustree(dg=dg, path=output_path)
     return dg
 
