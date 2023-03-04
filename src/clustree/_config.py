@@ -17,7 +17,7 @@ from clustree._clustree_typing import (
 from clustree._config_helpers import data_to_color, draw_circle
 from clustree._hash import hash_edge_id, hash_node_id
 
-CONTROL_LIST = ["init", "sample_info", "image", "node_color", "edge_color"]
+CONTROL_LIST = ["init", "sample_info", "image", "node_color", "edge_color", "draw"]
 DEFAULT_CONFIG = {k: True for k in CONTROL_LIST}
 
 
@@ -74,6 +74,8 @@ class ClustreeConfig:
             )
         if _setup_cf["edge_color"]:
             self.set_edge_color(edge_color=edge_color, cmap=edge_cmap, prefix=prefix)
+        if _setup_cf["draw"]:
+            self.set_drawn_image()
 
     def init_cf(self) -> None:
         for k_upper in range(1, self.kk + 1):
