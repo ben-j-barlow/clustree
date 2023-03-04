@@ -3,8 +3,9 @@ import copy
 import matplotlib as mpl
 import pytest
 
+from clustree._config import CONTROL_LIST
 from clustree._config import ClustreeConfig as cfg
-from clustree._config import CONTROL_LIST, data_to_color
+from clustree._config import data_to_color
 from clustree._hash import hash_edge_id, hash_node_id
 
 DEFAULT_CONFIG = {k: False for k in CONTROL_LIST}
