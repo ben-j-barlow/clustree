@@ -5,7 +5,7 @@ import pytest
 
 from clustree._graph import clustree
 from clustree._hash import hash_node_id
-from tests.helpers import INPUT_DIR, OUTPUT_DIR
+from tests.helpers import INPUT_DIR, OUTPUT_DIR, add_title_to_fig
 
 IMG_FILES = pytest.mark.datafiles(
     INPUT_DIR + "1_1.png",
@@ -51,3 +51,16 @@ def test_clustree_draw(datafiles, iris_data):
         draw=True,
         output_path=OUTPUT_DIR + "test_path.png",
     )
+
+
+def test_orientation_horizontal(iris_data):
+    output = OUTPUT_DIR + "test_horizontal"
+    title = "Horizontal plot (left to right)"
+    clustree(
+        data=iris_data,
+        prefix="K",
+        images=INPUT_DIR,
+        output_path=output,
+        orientation="horizontal",
+    )
+    add_title_to_fig(path=output, title=title)

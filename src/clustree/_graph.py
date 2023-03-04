@@ -32,6 +32,7 @@ def clustree(
     edge_color: EDGE_COLOR_TYPE = "samples",
     edge_cmap: CMAP_TYPE = None,
     errors: bool = False,
+    orientation: str = "vertical",
 ) -> DiGraph:
     """
     Create a plot of a clustering tree showing the relationship between clusterings \
@@ -78,6 +79,9 @@ def clustree(
         Whether to raise an error if an image is missing from directory supplied to
         images parameter. If False, a fake image will be created with text 'K_k' \
         where K is cluster resolution and k is cluster number. Defaults to False.
+    orientation: str, optional
+        'vertical' or 'horizontal' to control orientation in which samples flow \
+        through the graph. Defaults to 'vertical'.
 
     Returns
     -------
@@ -117,7 +121,7 @@ def clustree(
 
     dg = construct_clustree(cf=config)
     if draw or output_path:
-        draw_clustree(dg=dg, path=output_path)
+        draw_clustree(dg=dg, path=output_path, orientation=orientation)
     return dg
 
 
@@ -128,26 +132,42 @@ def construct_clustree(cf: ClustreeConfig) -> DiGraph:
     return dg
 
 
-def get_pos(dg: DiGraph) -> dict[int, np.ndarray]:
+def get_pos(dg: DiGraph, orientation: str) -> dict[int, np.ndarray]:
     """
     Produce position of each node. Use multipartite_layout, scale resulting positions \
     to [0, 1] interval and flip graph vertically by returning (1 - pos). This forces \
     the tree to position the root node at the top rather than the bottom.
 
-    :param dg: directed graph
     :return: (x, y) coordinates of nodes
+    Parameters
+    ----------
+    dg
+        Clustree.
+
+    Returns
+    -------
+    dict[int, np.ndarray]
+        Dictionary of form node_id: (x, y). x,y in [0, 1].
+
     """
     pos = multipartite_layout(dg, subset_key="res", align="horizontal")
-    y_vals = {v[1] for k, v in pos.items()}
+    x_vals, y_vals = [v[0] for k, v in pos.items()], [v[1] for k, v in pos.items()]
     min_y, max_y = min(y_vals), max(y_vals)
-    return {k: 1 - ((v - min_y) / (max_y - min_y)) for k, v in pos.items()}
+    min_x, max_x = min(x_vals), max(x_vals)
+
+    norm_x = [(x - min_x) / (max_x - min_x) for x in x_vals]
+    norm_y = [(y - min_y) / (max_y - min_y) for y in y_vals]
+    if orientation == "vertical":
+        return {k: (x, 1 - y) for k, x, y in zip(list(pos.keys()), norm_x, norm_y)}
+    return {k: (y, x) for k, x, y in zip(list(pos.keys()), norm_x, norm_y)}
 
 
 def draw_clustree(
     dg: DiGraph,
     path: OUTPUT_PATH_TYPE,
+    orientation: str,
 ):
-    pos = get_pos(dg=dg)
+    pos = get_pos(dg=dg, orientation=orientation)
     draw_with_images(dg=dg, pos=pos)
     if path:
         plt.savefig(path, dpi=400, bbox_inches="tight")
