@@ -1,5 +1,3 @@
-import copy
-
 import matplotlib as mpl
 import pytest
 
@@ -218,7 +216,7 @@ def test_set_node_color_no_agg_chosen(iris_data):
     setup_cf = DEFAULT_CONFIG
     setup_cf.update({"sample_info": True, "node_color": True})
     with pytest.raises(ValueError):
-        cf = cfg(
+        cfg(
             kk=3,
             prefix="K",
             data=iris_data,
@@ -228,7 +226,7 @@ def test_set_node_color_no_agg_chosen(iris_data):
             node_cmap=mpl.cm.Blues,
         )
     with pytest.raises(ValueError):
-        cf = cfg(
+        cfg(
             kk=3,
             prefix="K",
             data=iris_data,
