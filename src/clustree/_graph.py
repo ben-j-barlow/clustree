@@ -13,6 +13,7 @@ from clustree._clustree_typing import (
     DATA_INPUT_TYPE,
     EDGE_COLOR_TYPE,
     IMAGE_INPUT_TYPE,
+    MIN_CLUSTER_NUMBER_TYPE,
     NODE_COLOR_TYPE,
     ORIENTATION_INPUT_TYPE,
     OUTPUT_PATH_TYPE,
@@ -34,6 +35,7 @@ def clustree(
     edge_cmap: CMAP_TYPE = None,
     errors: bool = False,
     orientation: ORIENTATION_INPUT_TYPE = "vertical",
+    min_cluster_number: MIN_CLUSTER_NUMBER_TYPE = 1,
 ) -> DiGraph:
     """
     Create a plot of a clustering tree showing the relationship between clusterings \
@@ -81,9 +83,11 @@ def clustree(
         Whether to raise an error if an image is missing from directory supplied to
         images parameter. If False, a fake image will be created with text 'K_k' \
         where K is cluster resolution and k is cluster number. Defaults to False.
-    orientation: Literal['vertical', 'horizontal'], optional
+    orientation : Literal['vertical', 'horizontal'], optional
         'vertical' or 'horizontal' to control orientation in which samples flow \
         through the graph. Defaults to 'vertical'.
+    min_cluster_number : Literal[0, 1], optional
+        Indicates if cluster numbers are 0,...,(K-1) or 1,...,K.
 
     Returns
     -------
@@ -106,9 +110,11 @@ def clustree(
         - Other files in the directory will be ignored.
 
     """
+    start_at_1 = bool(min_cluster_number)
+
     _data = handle_data(data=data)
     kk = get_and_check_cluster_cols(cols=_data.columns, prefix=prefix)
-    _images = handle_images(images=images, kk=kk, errors=errors)
+    _images = handle_images(images=images, kk=kk, errors=errors, start_at_1=start_at_1)
     config = ClustreeConfig(
         image_cf=_images,
         prefix=prefix,
@@ -119,6 +125,7 @@ def clustree(
         node_cmap=node_cmap,
         edge_color=edge_color,
         edge_cmap=edge_cmap,
+        start_at_1=start_at_1,
     )
 
     dg = construct_clustree(cf=config)

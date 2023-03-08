@@ -22,6 +22,7 @@ IMAGE_CONFIG_TYPE = dict[int, np.ndarray]
 DATA_INPUT_TYPE = Union[str, Path, pd.DataFrame]
 IMAGE_INPUT_TYPE = Union[str, Path, IMAGE_CONFIG_TYPE]
 ORIENTATION_INPUT_TYPE = Literal["vertical", "horizontal"]
+MIN_CLUSTER_NUMBER_TYPE = Literal[0, 1]
 
 NODE_COLOR_TYPE = Any  # e.g. 'samples', 'K', data col name
 EDGE_COLOR_TYPE = Any

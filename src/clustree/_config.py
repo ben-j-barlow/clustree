@@ -33,6 +33,7 @@ class ClustreeConfig:
         node_cmap: CMAP_TYPE = None,
         edge_color: EDGE_COLOR_TYPE = None,
         edge_cmap: CMAP_TYPE = None,
+        start_at_1: bool = True,
         _setup_cf: Optional[dict[str, bool]] = None,
     ):
         if not node_color or node_color == "prefix":
@@ -48,6 +49,7 @@ class ClustreeConfig:
 
         self.prefix = prefix
         self.kk = kk
+        self.start_at_1 = start_at_1
         self.node_cf: NODE_CONFIG_TYPE = defaultdict(dict)
         self.edge_cf: EDGE_CONFIG_TYPE = defaultdict(dict)
         self.k_upper_to_node_id: dict[int, list[int]] = {}
@@ -79,13 +81,13 @@ class ClustreeConfig:
 
     def init_cf(self) -> None:
         for k_upper in range(1, self.kk + 1):
-            for k_lower in range(1, k_upper + 1):
+            if self.start_at_1:
+                _iter = range(1, k_upper + 1)
+            else:
+                _iter = range(0, k_upper)
+            for k_lower in _iter:
                 ind = hash_node_id(k_upper=k_upper, k_lower=k_lower)
                 self.node_cf[ind].update({"k": k_lower, "res": k_upper})
-            self.k_upper_to_node_id[k_upper] = [
-                hash_node_id(k_upper=k_upper, k_lower=ele)
-                for ele in list(range(1, k_upper + 1))
-            ]
 
     def set_image(self, image_cf: IMAGE_CONFIG_TYPE) -> None:
         for node_id, img in image_cf.items():
@@ -113,6 +115,7 @@ class ClustreeConfig:
             None
         """
         for k_upper in range(1, self.kk + 1):
+
             col = k_upper - 1  # use (k_upper - 1) since data is 0-indexed
             vals, counts = np.unique(data[:, col], return_counts=True)
             for k_end, node_samples in zip(vals, counts):
