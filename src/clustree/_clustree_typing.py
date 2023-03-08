@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Literal, Optional, Union
 
 import matplotlib as mpl
 import numpy as np
@@ -21,6 +21,7 @@ IMAGE_CONFIG_TYPE = dict[int, np.ndarray]
 
 DATA_INPUT_TYPE = Union[str, Path, pd.DataFrame]
 IMAGE_INPUT_TYPE = Union[str, Path, IMAGE_CONFIG_TYPE]
+ORIENTATION_INPUT_TYPE = Literal["vertical", "horizontal"]
 
 NODE_COLOR_TYPE = Any  # e.g. 'samples', 'K', data col name
 EDGE_COLOR_TYPE = Any

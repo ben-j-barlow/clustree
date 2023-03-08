@@ -14,6 +14,7 @@ from clustree._clustree_typing import (
     EDGE_COLOR_TYPE,
     IMAGE_INPUT_TYPE,
     NODE_COLOR_TYPE,
+    ORIENTATION_INPUT_TYPE,
     OUTPUT_PATH_TYPE,
 )
 from clustree._config import ClustreeConfig
@@ -26,13 +27,13 @@ def clustree(
     images: IMAGE_INPUT_TYPE,
     output_path: OUTPUT_PATH_TYPE = None,
     draw: bool = True,
-    node_color: NODE_COLOR_TYPE = None,  # if None, set equal to prefix
+    node_color: NODE_COLOR_TYPE = "prefix",
     node_color_aggr: COLOR_AGG_TYPE = None,
     node_cmap: CMAP_TYPE = None,
     edge_color: EDGE_COLOR_TYPE = "samples",
     edge_cmap: CMAP_TYPE = None,
     errors: bool = False,
-    orientation: str = "vertical",
+    orientation: ORIENTATION_INPUT_TYPE = "vertical",
 ) -> DiGraph:
     """
     Create a plot of a clustering tree showing the relationship between clusterings \
@@ -79,7 +80,7 @@ def clustree(
         Whether to raise an error if an image is missing from directory supplied to
         images parameter. If False, a fake image will be created with text 'K_k' \
         where K is cluster resolution and k is cluster number. Defaults to False.
-    orientation: str, optional
+    orientation: Literal['vertical', 'horizontal'], optional
         'vertical' or 'horizontal' to control orientation in which samples flow \
         through the graph. Defaults to 'vertical'.
 
@@ -132,7 +133,7 @@ def construct_clustree(cf: ClustreeConfig) -> DiGraph:
     return dg
 
 
-def get_pos(dg: DiGraph, orientation: str) -> dict[int, np.ndarray]:
+def get_pos(dg: DiGraph, orientation: ORIENTATION_INPUT_TYPE) -> dict[int, np.ndarray]:
     """
     Produce position of each node. Use multipartite_layout, scale resulting positions \
     to [0, 1] interval and flip graph vertically by returning (1 - pos). This forces \
@@ -165,7 +166,7 @@ def get_pos(dg: DiGraph, orientation: str) -> dict[int, np.ndarray]:
 def draw_clustree(
     dg: DiGraph,
     path: OUTPUT_PATH_TYPE,
-    orientation: str,
+    orientation: ORIENTATION_INPUT_TYPE,
 ):
     pos = get_pos(dg=dg, orientation=orientation)
     draw_with_images(dg=dg, pos=pos)
