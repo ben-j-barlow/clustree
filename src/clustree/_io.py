@@ -18,7 +18,7 @@ def get_fake_img(k_upper: str, k_lower: str, w: int = 40, h: int = 40) -> np.nda
     :param h: number of pixels
     :return: image with white background and black text
     """
-    img = Image.new("RGB", (w, h), color=(255, 255, 255))
+    img = Image.new("RGB", (w, h), color=(173, 153, 92))
     draw = ImageDraw.Draw(img)
     font = ImageFont.load_default()
     out = f"{k_upper}_{k_lower}"
