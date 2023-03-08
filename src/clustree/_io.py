@@ -42,5 +42,5 @@ def read_images(
         except FileNotFoundError as err:
             if errors:
                 raise err
-            to_return[node_id] = get_fake_img(k_upper=file[0], k_lower=file[2])
+            to_return[node_id] = get_fake_img(k_upper=k_upper, k_lower=k_lower)
     return to_return
