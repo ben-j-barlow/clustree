@@ -55,11 +55,12 @@ def clustree(
         supplied, will be overridden. Saving to file requires drawing.
     node_color : Any, optional
         For continuous colormap, use 'samples' or the name of a metadata column to \
-        color nodes by. For discrete colors, parse the same value parsed to prefix to \
-        color by resolution or specify a fixed color (see Specifying colors in \
+        color nodes by. For discrete colors, coloring by cluster resolution can be \
+        achieved by parsing 'prefix' or the same value parsed to the prefix parameter. \
+        Finally, it is possible to specify a fixed color (see Specifying colors in \
         Matplotlib tutorial here: \
         https://matplotlib.org/stable/tutorials/colors/colors.html). If None, default \
-        set equal to value of prefix to color by resolution.
+        set to 'prefix' to color by resolution.
     node_color_aggr : Union[Callable, str], optional
         If node_color is a column name then a function or string giving the name of a \
         function to aggregate that column for samples in each cluster.

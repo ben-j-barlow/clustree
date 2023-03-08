@@ -35,7 +35,7 @@ class ClustreeConfig:
         edge_cmap: CMAP_TYPE = None,
         _setup_cf: Optional[dict[str, bool]] = None,
     ):
-        if not node_color:
+        if not node_color or node_color == "prefix":
             node_color = prefix
         if not edge_color:
             edge_color = "samples"
