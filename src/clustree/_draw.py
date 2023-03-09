@@ -1,13 +1,13 @@
+import igraph as ig
 import matplotlib.pyplot as plt
 import numpy as np
-from networkx import (
-    DiGraph,
-    draw_networkx_edges,
-    get_edge_attributes,
-    multipartite_layout,
-)
+from networkx import DiGraph, draw_networkx_edges, get_edge_attributes
 
 from clustree._clustree_typing import ORIENTATION_INPUT_TYPE, OUTPUT_PATH_TYPE
+
+
+def ig_node_name_to_id(name, g):
+    return g.vs.find(name=name).index
 
 
 def get_pos(dg: DiGraph, orientation: ORIENTATION_INPUT_TYPE) -> dict[int, np.ndarray]:
@@ -28,7 +28,19 @@ def get_pos(dg: DiGraph, orientation: ORIENTATION_INPUT_TYPE) -> dict[int, np.nd
         Dictionary of form node_id: (x, y). x,y in [0, 1].
 
     """
-    pos = multipartite_layout(dg, subset_key="res", align="horizontal")
+
+    g = ig.Graph()
+    nodes = list(dg.nodes)
+    g.add_vertices(n=nodes)
+    edges = list(dg.edges)
+    ls_as_id = [
+        (ig_node_name_to_id(name=node_from, g=g), ig_node_name_to_id(name=node_to, g=g))
+        for node_from, node_to in edges
+    ]
+    g.add_edges(ls_as_id)
+    layout = g.layout_reingold_tilford(root=[0])
+    pos = {k: v for k, v in zip(nodes, layout.coords)}
+
     x_vals, y_vals = [v[0] for k, v in pos.items()], [v[1] for k, v in pos.items()]
     min_y, max_y = min(y_vals), max(y_vals)
     min_x, max_x = min(x_vals), max(x_vals)
