@@ -2,6 +2,7 @@ from collections import defaultdict
 from typing import Any, Optional
 
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import numpy as np
 import pandas as pd
 
@@ -158,7 +159,9 @@ class ClustreeConfig:
     ) -> None:
         if node_color == prefix:
             for node_id, attr in self.node_cf.items():
-                self.node_cf[node_id]["node_color"] = f"C{attr['res']}"
+                self.node_cf[node_id]["node_color"] = mpl.colors.to_rgba(
+                    f"C{attr['res']}"
+                )
         elif (use_samples := node_color == "samples") or (node_color in data.columns):
             # create to_parse = {node_id: value}
             if use_samples:
@@ -183,7 +186,7 @@ class ClustreeConfig:
                 self.node_cf[k]["node_color"] = v
         else:  # fixed color, e.g., mpl.colors object
             for node_id in self.node_cf:
-                self.node_cf[node_id]["node_color"] = node_color
+                self.node_cf[node_id]["node_color"] = mpl.colors.to_rgba(node_color)
 
     def set_edge_color(
         self,
