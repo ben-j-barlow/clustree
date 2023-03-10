@@ -61,11 +61,11 @@ def draw_clustree(
     dg: DiGraph,
     path: OUTPUT_PATH_TYPE,
     orientation: ORIENTATION_INPUT_TYPE,
-    kk: int,
+    img_len: float,
     circle_pos: CIRCLE_POS_TYPE,
 ):
     pos = get_pos(dg=dg, orientation=orientation)
-    draw_with_images(dg=dg, pos=pos, kk=kk, circle_pos=circle_pos)
+    draw_with_images(dg=dg, pos=pos, img_len=img_len, circle_pos=circle_pos)
     if path:
         plt.savefig(path, dpi=100, bbox_inches="tight")
     plt.close()
@@ -127,12 +127,12 @@ def get_circle_centre(
 def draw_custom_nodes(
     dg: DiGraph,
     pos,
-    kk: int,
+    img_len: float,
     ax,
     circle_pos: CIRCLE_POS_TYPE,
     circle_prop: float = 0.1,
 ):
-    img_len = 1 / (2 * kk)
+
     radius = img_len * circle_prop / 2
     for node_id, attr in dg.nodes.items():
         img_cent_anchor = pos[node_id]
