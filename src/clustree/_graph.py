@@ -130,8 +130,10 @@ def clustree(
     dg = construct_clustree(cf=config)
     if draw or output_path:
         draw_clustree(
-            dg=dg, path=output_path, orientation=orientation,
-            #img_len=1 / (2 * kk), circle_pos=pos
+            dg=dg,
+            path=output_path,
+            orientation=orientation,
+            # img_len=1 / (2 * kk), circle_pos=pos
         )
     return dg
 

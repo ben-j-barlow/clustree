@@ -62,6 +62,8 @@ def draw_clustree(
     if path:
         plt.savefig(path, dpi=400, bbox_inches="tight")
         plt.close()
+
+
 def draw_with_images(
     dg: DiGraph,
     pos: dict[int, np.ndarray],
