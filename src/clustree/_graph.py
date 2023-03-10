@@ -1,6 +1,9 @@
+from typing import Optional
+
 from networkx import DiGraph
 
 from clustree._clustree_typing import (
+    CIRCLE_POS_TYPE,
     CMAP_TYPE,
     COLOR_AGG_TYPE,
     DATA_INPUT_TYPE,
@@ -30,6 +33,8 @@ def clustree(
     errors: bool = False,
     orientation: ORIENTATION_INPUT_TYPE = "vertical",
     min_cluster_number: MIN_CLUSTER_NUMBER_TYPE = 1,
+    pos: CIRCLE_POS_TYPE = "tr",
+    kk: Optional[int] = None,
 ) -> DiGraph:
     """
     Create a plot of a clustering tree showing the relationship between clusterings \
@@ -107,7 +112,7 @@ def clustree(
     start_at_1 = bool(min_cluster_number)
 
     _data = handle_data(data=data)
-    kk = get_and_check_cluster_cols(cols=_data.columns, prefix=prefix)
+    kk = get_and_check_cluster_cols(cols=_data.columns, prefix=prefix, user_kk=kk)
     _images = handle_images(images=images, kk=kk, errors=errors, start_at_1=start_at_1)
     config = ClustreeConfig(
         image_cf=_images,
@@ -124,7 +129,9 @@ def clustree(
 
     dg = construct_clustree(cf=config)
     if draw or output_path:
-        draw_clustree(dg=dg, path=output_path, orientation=orientation)
+        draw_clustree(
+            dg=dg, path=output_path, orientation=orientation, img_len=1 / (2 * kk), circle_pos=pos
+        )
     return dg
 
 
