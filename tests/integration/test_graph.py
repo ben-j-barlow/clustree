@@ -18,7 +18,7 @@ IMG_FILES = pytest.mark.datafiles(
 
 
 @IMG_FILES
-def test_clustree_draw(datafiles, iris_data):
+def test_clustree_draw_dict(datafiles, iris_data):
     to_read = [Path(ele) for ele in datafiles.listdir()]
     img_files = {
         hash_node_id(int(file.stem[0]), int(file.stem[2])): plt.imread(file)
@@ -34,6 +34,8 @@ def test_clustree_draw(datafiles, iris_data):
         output_path=OUTPUT_DIR + "test_dict.png",
     )
 
+
+def test_clustree_draw_str(datafiles, iris_data):
     # images as str
     clustree(
         data=iris_data,
@@ -43,6 +45,8 @@ def test_clustree_draw(datafiles, iris_data):
         output_path=OUTPUT_DIR + "test_str.png",
     )
 
+
+def test_clustree_draw_path(datafiles, iris_data):
     # images as path
     clustree(
         data=iris_data,

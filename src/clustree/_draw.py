@@ -1,16 +1,21 @@
 import igraph as ig
 import matplotlib.pyplot as plt
-import numpy as np
 from networkx import DiGraph, draw_networkx_edges, get_edge_attributes
 
-from clustree._clustree_typing import ORIENTATION_INPUT_TYPE, OUTPUT_PATH_TYPE
+from clustree._clustree_typing import (
+    CIRCLE_POS_TYPE,
+    ORIENTATION_INPUT_TYPE,
+    OUTPUT_PATH_TYPE,
+)
 
 
 def ig_node_name_to_id(name, g):
     return g.vs.find(name=name).index
 
 
-def get_pos(dg: DiGraph, orientation: ORIENTATION_INPUT_TYPE) -> dict[int, np.ndarray]:
+def get_pos(
+    dg: DiGraph, orientation: ORIENTATION_INPUT_TYPE
+) -> dict[int, tuple[float, float]]:
     """
     Produce position of each node. Use multipartite_layout, scale resulting positions \
     to [0, 1] interval and flip graph vertically by returning (1 - pos). This forces \
@@ -56,42 +61,95 @@ def draw_clustree(
     dg: DiGraph,
     path: OUTPUT_PATH_TYPE,
     orientation: ORIENTATION_INPUT_TYPE,
+    kk: int,
+    circle_pos: CIRCLE_POS_TYPE,
 ):
     pos = get_pos(dg=dg, orientation=orientation)
-    draw_with_images(dg=dg, pos=pos)
+    draw_with_images(dg=dg, pos=pos, kk=kk, circle_pos=circle_pos)
     if path:
-        plt.savefig(path, dpi=400, bbox_inches="tight")
+        plt.savefig(path, dpi=100, bbox_inches="tight")
+    plt.close()
 
 
 def draw_with_images(
     dg: DiGraph,
-    pos: dict[int, np.ndarray],
-    icon_size: float = 0.04,
+    pos: dict[int, tuple[float, float]],
+    kk: int,
+    circle_pos: CIRCLE_POS_TYPE,
 ):
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(5, 5), dpi=100)
 
     node_shape = "s"
     colors = get_edge_attributes(dg, "edge_color").values()
     alpha = get_edge_attributes(dg, "alpha").values()
 
     draw_networkx_edges(
-        G=dg, pos=pos, node_shape=node_shape, edge_color=colors, alpha=list(alpha)
+        G=dg,
+        pos=pos,
+        node_shape=node_shape,
+        node_size=600,
+        edge_color=colors,
+        alpha=list(alpha),
+        ax=ax,
     )
 
-    tr_figure = ax.transData.transform
-    tr_axes = fig.transFigure.inverted().transform
-
-    ax_range = ax.get_xlim()[1] - ax.get_xlim()[0]
-    icon_size *= ax_range
-    icon_center = icon_size / 2.0
-
-    for n in dg.nodes:
-        xf, yf = tr_figure(pos[n])
-        xa, ya = tr_axes((xf, yf))
-        a = plt.axes([xa - icon_center, ya - icon_center, icon_size, icon_size])
-
-        a.imshow(dg.nodes[n]["image_with_drawing"])
-
-        a.patch.set_visible(False)
-        a.axis("off")
+    draw_custom_nodes(dg=dg, pos=pos, ax=ax, kk=kk, circle_pos=circle_pos)
+    ax.autoscale()
     ax.axis("off")
+
+
+def get_extent(bl_anchor, length):
+    return [bl_anchor[0], bl_anchor[0] + length, bl_anchor[1], bl_anchor[1] + length]
+
+
+def get_circle_centre(
+    radius: float,
+    pos: CIRCLE_POS_TYPE,
+    bl_anchor: tuple[float, float],
+    length: float,
+) -> tuple[float, float]:
+    l, b = bl_anchor
+    r, t = l + length, b + length
+    pos_dict = {
+        "tl": (l + radius, t - radius),
+        "t": (l + (length / 2), t - radius),
+        "tr": (r - radius, t - radius),
+        "l": (l + radius, b + (length / 2)),
+        "r": (r - radius, b + (length / 2)),
+        "bl": (l + radius, b + radius),
+        "b": (l + (length / 2), b + radius),
+        "br": (r - radius, b + radius),
+    }
+    to_return = pos_dict[pos]
+    return to_return
+
+
+def draw_custom_nodes(
+    dg: DiGraph,
+    pos,
+    kk: int,
+    ax,
+    circle_pos: CIRCLE_POS_TYPE,
+    circle_prop: float = 0.1,
+):
+    img_len = 1 / (2 * kk)
+    radius = img_len * circle_prop / 2
+    for node_id, attr in dg.nodes.items():
+        img_cent_anchor = pos[node_id]
+        img_bl_anchor = (
+            img_cent_anchor[0] - (img_len / 2),
+            img_cent_anchor[1] - (img_len / 2),
+        )
+        ax.imshow(
+            attr["image"], extent=get_extent(bl_anchor=img_bl_anchor, length=img_len)
+        )
+        circ_cent_anchor = get_circle_centre(
+            radius=radius, pos=circle_pos, bl_anchor=img_bl_anchor, length=img_len
+        )
+        circle = plt.Circle(
+            circ_cent_anchor,
+            radius=radius,
+            fill=True,
+            color=attr["node_color"],
+        )
+        ax.add_artist(circle)
