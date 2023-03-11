@@ -28,6 +28,7 @@ networkx = "^3"
 matplotlib = "^3.6"
 pairing-functions = "0.2.1"
 igraph = "^0.10.4"
+opencv-python = "^4.7.0.72"
 
 [tool.poetry.group.dev.dependencies]
 black = "^22"
@@ -36,6 +37,7 @@ flake8 = "^6"
 jupyter = "^1.0.0"
 pytest-datafiles = "^2"
 pytest = "^7"
+memory-profiler = "^0.61.0"
 
 [build-system]
 requires = ["poetry-core"]

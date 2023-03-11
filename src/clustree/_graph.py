@@ -16,7 +16,7 @@ from clustree._clustree_typing import (
 )
 from clustree._config import ClustreeConfig
 from clustree._draw import draw_clustree
-from clustree._handle_pars import get_and_check_cluster_cols, handle_data, handle_images
+from clustree._handle_pars import get_and_check_cluster_cols, handle_data
 
 
 def clustree(
@@ -30,10 +30,12 @@ def clustree(
     node_cmap: CMAP_TYPE = None,
     edge_color: EDGE_COLOR_TYPE = "samples",
     edge_cmap: CMAP_TYPE = None,
-    errors: bool = False,
     orientation: ORIENTATION_INPUT_TYPE = "vertical",
     min_cluster_number: MIN_CLUSTER_NUMBER_TYPE = 1,
     pos: CIRCLE_POS_TYPE = "tr",
+    figsize=None,
+    node_size=300,
+    dpi=1000,
     kk: Optional[int] = None,
 ) -> DiGraph:
     """
@@ -109,13 +111,21 @@ def clustree(
         - Other files in the directory will be ignored.
 
     """
-    start_at_1 = bool(min_cluster_number)
-
     _data = handle_data(data=data)
     kk = get_and_check_cluster_cols(cols=_data.columns, prefix=prefix, user_kk=kk)
-    _images = handle_images(images=images, kk=kk, errors=errors, start_at_1=start_at_1)
+
+    images = str(images)
+    if images[-1] != "/":
+        images = images + "/"
+    start_at_1 = bool(min_cluster_number)
+    if not figsize:
+        if kk < 6:
+            figsize = (3, 3)
+        else:
+            w = min([kk, 20]) / 2
+            figsize = (w, w)
+
     config = ClustreeConfig(
-        image_cf=_images,
         prefix=prefix,
         kk=kk,
         data=_data,
@@ -133,7 +143,10 @@ def clustree(
             dg=dg,
             path=output_path,
             orientation=orientation,
-            # img_len=1 / (2 * kk), circle_pos=pos
+            images=images,
+            figsize=figsize,
+            node_size=node_size,
+            dpi=dpi,
         )
     return dg
 

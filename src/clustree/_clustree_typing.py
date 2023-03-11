@@ -2,7 +2,6 @@ from pathlib import Path
 from typing import Any, Callable, Literal, Optional, Union
 
 import matplotlib as mpl
-import numpy as np
 import pandas as pd
 
 OUTPUT_PATH_TYPE = Optional[Union[str, Path]]
@@ -17,10 +16,8 @@ EDGE_CONFIG_TYPE = [
     dict[str, Any],  # 'color', 'samples', 'alpha', 'start', 'end', 'res'
 ]
 
-IMAGE_CONFIG_TYPE = dict[int, np.ndarray]
-
 DATA_INPUT_TYPE = Union[str, Path, pd.DataFrame]
-IMAGE_INPUT_TYPE = Union[str, Path, IMAGE_CONFIG_TYPE]
+IMAGE_INPUT_TYPE = Union[str, Path]
 ORIENTATION_INPUT_TYPE = Optional[Literal["vertical", "horizontal"]]
 MIN_CLUSTER_NUMBER_TYPE = Optional[Literal[0, 1]]
 CIRCLE_POS_TYPE = Optional[Literal["tl", "t", "tr", "l", "r", "bl", "b", "br"]]

@@ -12,7 +12,7 @@ DEFAULT_CONFIG = {k: False for k in CONTROL_LIST}
 def test_init_cf(iris_data):
     setup_cf = DEFAULT_CONFIG
     setup_cf["init"] = True
-    cf = cfg(kk=3, prefix="K", data=iris_data, image_cf=None, _setup_cf=setup_cf)
+    cf = cfg(kk=3, prefix="K", data=iris_data, _setup_cf=setup_cf)
     assert cf.node_cf[hash_node_id(1, 1)]["k"] == 1
     assert cf.node_cf[hash_node_id(1, 1)]["res"] == 1
 
@@ -32,7 +32,7 @@ def test_init_cf(iris_data):
 def test_set_sample_information_node(iris_data):
     setup_cf = DEFAULT_CONFIG
     setup_cf["sample_info"] = True
-    cf = cfg(kk=3, prefix="K", data=iris_data, image_cf=None, _setup_cf=setup_cf)
+    cf = cfg(kk=3, prefix="K", data=iris_data, _setup_cf=setup_cf)
     assert len(cf.node_cf) == 6
 
     assert cf.node_cf[hash_node_id(1, 1)]["samples"] == 150
@@ -48,7 +48,7 @@ def test_set_sample_information_node(iris_data):
 def test_set_sample_information_edge(iris_data):
     setup_cf = DEFAULT_CONFIG
     setup_cf["sample_info"] = True
-    cf = cfg(kk=3, prefix="K", data=iris_data, image_cf=None, _setup_cf=setup_cf)
+    cf = cfg(kk=3, prefix="K", data=iris_data, _setup_cf=setup_cf)
     assert len(cf.edge_cf) == 6
 
     # samples and alpha
@@ -122,11 +122,10 @@ def test_set_node_color_prefix(iris_data):
         kk=3,
         prefix="K",
         data=iris_data,
-        image_cf=None,
         _setup_cf=setup_cf,
         node_color="K",
     )
-    exp = [f"C{res}" for res in [1, 2, 2, 3, 3, 3]]
+    exp = [mpl.colors.to_rgba(f"C{res}") for res in [1, 2, 2, 3, 3, 3]]
     assert [cf.node_cf[k]["node_color"] for k in cf.node_cf] == exp
 
 
@@ -137,7 +136,6 @@ def test_set_node_color_samples(iris_data):
         kk=3,
         prefix="K",
         data=iris_data,
-        image_cf=None,
         _setup_cf=setup_cf,
         node_color="samples",
         node_cmap=mpl.cm.Blues,
@@ -186,7 +184,6 @@ def test_set_node_color_agg(iris_data):
         kk=3,
         prefix="K",
         data=iris_data,
-        image_cf=None,
         _setup_cf=setup_cf,
         node_color="sepal_length",
         node_color_aggr=sum,
@@ -201,7 +198,6 @@ def test_set_node_color_agg(iris_data):
         kk=3,
         prefix="K",
         data=iris_data,
-        image_cf=None,
         _setup_cf=setup_cf,
         node_color="sepal_length",
         node_color_aggr="sum",
@@ -220,7 +216,6 @@ def test_set_node_color_no_agg_chosen(iris_data):
             kk=3,
             prefix="K",
             data=iris_data,
-            image_cf=None,
             _setup_cf=setup_cf,
             node_color="sepal_length",
             node_cmap=mpl.cm.Blues,
@@ -230,7 +225,6 @@ def test_set_node_color_no_agg_chosen(iris_data):
             kk=3,
             prefix="K",
             data=iris_data,
-            image_cf=None,
             _setup_cf=setup_cf,
             node_color="sepal_length",
             node_color_aggr=None,
@@ -245,13 +239,12 @@ def test_set_node_color_fixed(iris_data):
         kk=3,
         prefix="K",
         data=iris_data,
-        image_cf=None,
         _setup_cf=setup_cf,
         node_color="C1",
     )
     act_color = [v["node_color"] for k, v in cf.node_cf.items()]
-    assert all([isinstance(v["node_color"], str) for k, v in cf.node_cf.items()])
-    assert act_color == ["C1" for _ in range(6)]
+    assert all([isinstance(ele["node_color"], tuple) for ele in cf.node_cf.values()])
+    assert act_color == [mpl.colors.to_rgba("C1") for _ in range(6)]
 
 
 def test_set_edge_color_prefix(iris_data):
@@ -261,7 +254,6 @@ def test_set_edge_color_prefix(iris_data):
         kk=3,
         prefix="K",
         data=iris_data,
-        image_cf=None,
         _setup_cf=setup_cf,
         edge_color="K",
     )
@@ -276,7 +268,6 @@ def test_set_edge_color_samples(iris_data):
         kk=3,
         prefix="K",
         data=iris_data,
-        image_cf=None,
         _setup_cf=setup_cf,
         edge_color="samples",
     )
@@ -311,7 +302,6 @@ def test_set_edge_color_fixed(iris_data):
         kk=3,
         prefix="K",
         data=iris_data,
-        image_cf=None,
         _setup_cf=setup_cf,
         edge_color="C1",
     )

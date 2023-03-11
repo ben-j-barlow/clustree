@@ -1,8 +1,8 @@
 from collections import defaultdict
 from typing import Any, Optional
 
-import matplotlib.pyplot as plt
 import matplotlib as mpl
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
@@ -11,14 +11,13 @@ from clustree._clustree_typing import (
     COLOR_AGG_TYPE,
     EDGE_COLOR_TYPE,
     EDGE_CONFIG_TYPE,
-    IMAGE_CONFIG_TYPE,
     NODE_COLOR_TYPE,
     NODE_CONFIG_TYPE,
 )
-from clustree._config_helpers import data_to_color, draw_circle
+from clustree._config_helpers import data_to_color
 from clustree._hash import hash_edge_id, hash_node_id
 
-CONTROL_LIST = ["init", "sample_info", "image", "node_color", "edge_color", "draw"]
+CONTROL_LIST = ["init", "sample_info", "node_color", "edge_color"]
 DEFAULT_CONFIG = {k: True for k in CONTROL_LIST}
 
 
@@ -27,7 +26,6 @@ class ClustreeConfig:
         self,
         kk: int,
         data: pd.DataFrame,
-        image_cf: IMAGE_CONFIG_TYPE,
         prefix: str,
         node_color: NODE_COLOR_TYPE = None,
         node_color_aggr: COLOR_AGG_TYPE = None,
@@ -65,8 +63,6 @@ class ClustreeConfig:
             self.init_cf()
         if _setup_cf["sample_info"]:
             self.set_sample_information(data=cluster_membership)
-        if _setup_cf["image"]:
-            self.set_image(image_cf=image_cf)
         if _setup_cf["node_color"]:
             self.set_node_color(
                 node_color=node_color,
@@ -77,8 +73,6 @@ class ClustreeConfig:
             )
         if _setup_cf["edge_color"]:
             self.set_edge_color(edge_color=edge_color, cmap=edge_cmap, prefix=prefix)
-        if _setup_cf["draw"]:
-            self.set_drawn_image()
 
     def init_cf(self) -> None:
         for k_upper in range(1, self.kk + 1):
@@ -89,18 +83,6 @@ class ClustreeConfig:
             for k_lower in _iter:
                 ind = hash_node_id(k_upper=k_upper, k_lower=k_lower)
                 self.node_cf[ind].update({"k": k_lower, "res": k_upper})
-
-    def set_image(self, image_cf: IMAGE_CONFIG_TYPE) -> None:
-        for node_id, img in image_cf.items():
-            self.node_cf[node_id]["image"] = image_cf[node_id]
-
-    def set_drawn_image(self) -> None:
-        for k, v in self.node_cf.items():
-            self.node_cf[k]["image_with_drawing"] = draw_circle(
-                img=v["image"],
-                radius=0.1,
-                node_color=v["node_color"],
-            )
 
     def set_sample_information(self, data: np.ndarray) -> None:
         """

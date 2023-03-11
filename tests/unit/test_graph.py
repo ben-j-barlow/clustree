@@ -2,8 +2,6 @@ import os
 import tempfile
 from pathlib import Path
 
-import pytest
-
 from clustree._graph import clustree
 from clustree._hash import hash_node_id
 from tests.helpers import INPUT_DIR
@@ -36,7 +34,6 @@ def test_clustree_start_at_0(iris_data_0):
         draw=False,
         output_path=None,
         min_cluster_number=min_k_lower,
-        errors=False,
     )
 
     assert dg.number_of_edges() == 6
@@ -49,24 +46,6 @@ def test_clustree_start_at_0(iris_data_0):
         (hash_node_id(2, 1), hash_node_id(3, 1)),
         (hash_node_id(2, 1), hash_node_id(3, 2)),
     }
-
-
-def test_clustree_start_at_0_err(iris_data_0):
-    min_k_lower = 0
-
-    assert not os.path.isfile(INPUT_DIR + "1_0.png")
-    assert min_k_lower == 0
-
-    with pytest.raises(FileNotFoundError):
-        clustree(
-            data=iris_data_0,
-            prefix="K",
-            images=INPUT_DIR,
-            draw=False,
-            output_path=None,
-            min_cluster_number=min_k_lower,
-            errors=True,
-        )
 
 
 def test_path_override_draw(iris_data):

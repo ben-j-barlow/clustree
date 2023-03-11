@@ -1,34 +1,26 @@
+from typing import Sequence, Union
+
+import cv2
 import igraph as ig
 import matplotlib.pyplot as plt
 import numpy as np
-from networkx import DiGraph, draw_networkx_edges, get_edge_attributes
+from matplotlib.path import get_path_collection_extents
+from networkx import DiGraph, draw_networkx_edges
 
-from clustree._clustree_typing import ORIENTATION_INPUT_TYPE, OUTPUT_PATH_TYPE
+from clustree._clustree_typing import (
+    IMAGE_INPUT_TYPE,
+    ORIENTATION_INPUT_TYPE,
+    OUTPUT_PATH_TYPE,
+)
 
 
 def ig_node_name_to_id(name, g):
     return g.vs.find(name=name).index
 
 
-def get_pos(dg: DiGraph, orientation: ORIENTATION_INPUT_TYPE) -> dict[int, np.ndarray]:
-    """
-    Produce position of each node. Use multipartite_layout, scale resulting positions \
-    to [0, 1] interval and flip graph vertically by returning (1 - pos). This forces \
-    the tree to position the root node at the top rather than the bottom.
-
-    :return: (x, y) coordinates of nodes
-    Parameters
-    ----------
-    dg
-        Clustree.
-
-    Returns
-    -------
-    dict[int, np.ndarray]
-        Dictionary of form node_id: (x, y). x,y in [0, 1].
-
-    """
-
+def get_pos(
+    dg: DiGraph, orientation: ORIENTATION_INPUT_TYPE
+) -> dict[int, tuple[float, float]]:
     g = ig.Graph()
     nodes = list(dg.nodes)
     g.add_vertices(n=nodes)
@@ -52,47 +44,124 @@ def get_pos(dg: DiGraph, orientation: ORIENTATION_INPUT_TYPE) -> dict[int, np.nd
     return {k: (y, x) for k, x, y in zip(list(pos.keys()), norm_x, norm_y)}
 
 
+def getbb(sc, ax):
+    """Function to return a list of bounding boxes in data coordinates
+    for a scatter plot"""
+    ax.figure.canvas.draw()  # need to draw before the transforms are set.
+    transform = sc.get_transform()
+    transOffset = sc.get_offset_transform()
+    offsets = sc._offsets
+    paths = sc.get_paths()
+    transforms = sc.get_transforms()
+
+    if not transform.is_affine:
+        paths = [transform.transform_path_non_affine(p) for p in paths]
+        transform = transform.get_affine()
+    if not transOffset.is_affine:
+        offsets = transOffset.transform_non_affine(offsets)
+        transOffset = transOffset.get_affine()
+
+    if isinstance(offsets, np.ma.MaskedArray):
+        offsets = offsets.filled(np.nan)
+
+    bboxes = []
+
+    if len(paths) and len(offsets):
+        if len(paths) < len(offsets):
+            # for usual scatters you have one path, but several offsets
+            paths = [paths[0]] * len(offsets)
+        if len(transforms) < len(offsets):
+            # often you may have a single scatter size, but several offsets
+            transforms = [transforms[0]] * len(offsets)
+
+        for p, o, t in zip(paths, offsets, transforms):
+            result = get_path_collection_extents(
+                transform.frozen(), [p], [t], [o], transOffset.frozen()
+            )
+            bboxes.append(result.transformed(ax.transData.inverted()))
+
+    return bboxes
+
+
+def bb_to_extent(bb):
+    bb = bb._points
+    l, b = bb[0][0], bb[0][1]
+    r, t = bb[1][0], bb[1][1]
+    return (l, r, b, t)
+
+
+def get_nodes_bbox(dg, pos, figsize, node_size):
+    fig, ax = plt.subplots(figsize=figsize)
+
+    # draw_edges
+    draw_networkx_edges(G=dg, pos=pos, node_shape="s", node_size=node_size, ax=ax)
+
+    # draw scatter
+    nodelist = list(dg)
+    xy = np.asarray([pos[v] for v in nodelist])
+    node_size = 300
+    node_color = "#1f78b4"
+    alpha = None
+    cmap = None
+    vmin = None
+    vmax = None
+    ax = ax
+    linewidths = None
+    edgecolors = None
+    label = None
+
+    node_collection = ax.scatter(
+        xy[:, 0],
+        xy[:, 1],
+        s=node_size,
+        c=node_color,
+        marker="s",
+        cmap=cmap,
+        vmin=vmin,
+        vmax=vmax,
+        alpha=alpha,
+        linewidths=linewidths,
+        edgecolors=edgecolors,
+        label=label,
+    )
+
+    # use get_bb
+    bbox = {
+        node_id: bb for node_id, bb in zip(nodelist, getbb(sc=node_collection, ax=ax))
+    }
+    extent = {node_id: bb_to_extent(ele) for node_id, ele in bbox.items()}
+    plt.close()
+    return extent
+
+
+def draw_custom_nodes(
+    dg: DiGraph, extent: Sequence[float], path: IMAGE_INPUT_TYPE, ax: plt.Axes
+):
+    for node_id, attr in dg.nodes.data():
+        file_name: str = f"{attr['res']}_{attr['k']}.png"
+        img_path = path + file_name
+        img = cv2.imread(img_path)
+        ax.imshow(img, extent=extent[node_id], aspect=1, origin="upper", zorder=2)
+    ax.autoscale()
+
+
 def draw_clustree(
     dg: DiGraph,
     path: OUTPUT_PATH_TYPE,
+    images: IMAGE_INPUT_TYPE,
     orientation: ORIENTATION_INPUT_TYPE,
+    figsize: tuple[Union[int, float], Union[int, float]],
+    node_size: Union[int, float],
+    dpi: int,
 ):
     pos = get_pos(dg=dg, orientation=orientation)
-    draw_with_images(dg=dg, pos=pos)
-    if path:
-        plt.savefig(path, dpi=400, bbox_inches="tight")
-        plt.close()
+    extent = get_nodes_bbox(dg=dg, pos=pos, figsize=figsize, node_size=node_size)
 
-
-def draw_with_images(
-    dg: DiGraph,
-    pos: dict[int, np.ndarray],
-    icon_size: float = 0.04,
-):
     fig, ax = plt.subplots()
-
-    node_shape = "s"
-    colors = get_edge_attributes(dg, "edge_color").values()
-    alpha = get_edge_attributes(dg, "alpha").values()
-
     draw_networkx_edges(
-        G=dg, pos=pos, node_shape=node_shape, edge_color=colors, alpha=list(alpha)
+        G=dg, pos=pos, node_shape="s", node_size=node_size, arrows=False, ax=ax
     )
-
-    tr_figure = ax.transData.transform
-    tr_axes = fig.transFigure.inverted().transform
-
-    ax_range = ax.get_xlim()[1] - ax.get_xlim()[0]
-    icon_size *= ax_range
-    icon_center = icon_size / 2.0
-
-    for n in dg.nodes:
-        xf, yf = tr_figure(pos[n])
-        xa, ya = tr_axes((xf, yf))
-        a = plt.axes([xa - icon_center, ya - icon_center, icon_size, icon_size])
-
-        a.imshow(dg.nodes[n]["image_with_drawing"])
-
-        a.patch.set_visible(False)
-        a.axis("off")
-    ax.axis("off")
+    draw_custom_nodes(dg=dg, extent=extent, path=images, ax=ax)
+    if path:
+        plt.savefig(path, dpi=dpi, bbox_inches="tight")
+    plt.close()
