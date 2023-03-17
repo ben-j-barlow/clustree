@@ -40,6 +40,8 @@ class ClustreeConfig:
             node_color = prefix
         if not edge_color:
             edge_color = "samples"
+        elif edge_color == "prefix":
+            edge_color = prefix
         if not _setup_cf:
             _setup_cf = DEFAULT_CONFIG
         if not node_cmap:

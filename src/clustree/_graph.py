@@ -33,8 +33,8 @@ def clustree(
     layout_reingold_tilford: bool = None,
     min_cluster_number: MIN_CLUSTER_NUMBER_TYPE = 1,
     border_size: float = 0.05,
-    figsize=None,
-    arrows=None,
+    figsize: tuple[float, float] = None,
+    arrows: bool = None,
     node_size: float = 300,
     node_size_edge: Optional[float] = None,
     dpi: float = 500,
@@ -51,35 +51,55 @@ def clustree(
     images : Union[Path, str]
         Path of directory that contains images.
     output_path : Union[Path, str], optional
-        Absolute path to save clustree drawing at. If file extension is supplied, must be .png. If None, then output not written to file.
+        Absolute path to save clustree drawing at. If file extension is supplied, must \
+        be .png. If None, then output not written to file.
     draw : bool
-        Whether to draw the clustree. Defaults to True. If False and output_path supplied, will be overridden.
+        Whether to draw the clustree. Defaults to True. If False and output_path \
+        supplied, will be overridden.
     node_color : str
-        For continuous colormap, use 'samples' or the name of a metadata column to color nodes by. For discrete colors, use 'prefix' to color by resolution or specify a fixed color (see Specifying colors in Matplotlib tutorial here: https://matplotlib.org/stable/tutorials/colors/colors.html). If None, default set equal to value of prefix to color by resolution.
+        For continuous colormap, use 'samples' or the name of a metadata column to \
+        color nodes by. For discrete colors, use 'prefix' to color by resolution or \
+        specify a fixed color (see Specifying colors in Matplotlib tutorial here: \
+        https://matplotlib.org/stable/tutorials/colors/colors.html). If None, default \
+        set equal to value of prefix to color by resolution.
     node_color_aggr : Union[Callable, str], optional
-        If node_color is a column name then a function or string giving the name of a function to aggregate that column for samples in each cluster.
+        If node_color is a column name then a function or string giving the name of a \
+        function to aggregate that column for samples in each cluster.
     node_cmap : Union[mpl.colors.Colormap, str]
-        If node_color is 'samples' or a column name then a colourmap to use (see Colormap Matplotlib tutorial here: https://matplotlib.org/stable/tutorials/colors/colormaps.html).
+        If node_color is 'samples' or a column name then a colourmap to use (see \
+        Colormap Matplotlib tutorial here: \
+        https://matplotlib.org/stable/tutorials/colors/colormaps.html).
     edge_color : str
-        For continuous colormap, use 'samples'. For discrete colors, use 'prefix' to color by resolution or specify a fixed color (see Specifying colors in Matplotlib tutorial here: https://matplotlib.org/stable/tutorials/colors/colors.html). If None, default set to 'samples'.
+        For continuous colormap, use 'samples'. For discrete colors, use 'prefix' to \
+        color by resolution or specify a fixed color (see Specifying colors in \
+        Matplotlib tutorial here: \
+        https://matplotlib.org/stable/tutorials/colors/colors.html). If None, default \
+        set to 'samples'.
     edge_cmap : Union[mpl.colors.Colormap, str]
-        If edge_color is 'samples' then a colourmap to use (see Colormap Matplotlib tutorial here: https://matplotlib.org/stable/tutorials/colors/colormaps.html).
+        If edge_color is 'samples' then a colourmap to use (see Colormap Matplotlib \
+        tutorial here: https://matplotlib.org/stable/tutorials/colors/colormaps.html).
     orientation : Literal["vertical", "horizontal"]
         Orientation of clustree drawing. Defaults to 'vertical'.
     layout_reingold_tilford : bool, optional
-        Whether to use the Reingold-Tilford algorithm for node positioning. Defaults to True if (kk <= 12), False otherwise. Setting True not recommended if (kk > 12) due to memory bottleneck in igraph dependency.
+        Whether to use the Reingold-Tilford algorithm for node positioning. Defaults \
+        to True if (kk <= 12), False otherwise. Setting True not recommended if \
+        (kk > 12) due to memory bottleneck in igraph dependency.
     min_cluster_number : Literal[0, 1]
         0 if cluster number is (0, ..., K-1) or 1 if (1, ..., K). Defaults to 1.
     border_size : float
         Border width as proportion of image width. Defaults to 0.05.
     figsize : tuple[float, float]
-        Parsed to matplotlib to determine figure size. Defaults to (kk/2, kk/2), clipped to a minimum of (3,3) and maximum of (10,10).
+        Parsed to matplotlib to determine figure size. Defaults to (kk/2, kk/2), \
+        clipped to a minimum of (3,3) and maximum of (10,10).
     arrows : bool
-        Whether to add arrows to graph edges. Removing arrows alleviates appearance issue caused by arrows overlapping nodes. Defaults to True.
+        Whether to add arrows to graph edges. Removing arrows alleviates appearance \
+        issue caused by arrows overlapping nodes. Defaults to True.
     node_size : float
-        Size of nodes in clustree graph drawing. Parsed directly to networkx.draw_networkx_nodes. Deafult to 300.
+        Size of nodes in clustree graph drawing. Parsed directly to \
+        networkx.draw_networkx_nodes. Deafult to 300.
     node_size_edge: float
-        Controls edge start and end point. Parsed directly to networkx.draw_networkx_edges.
+        Controls edge start and end point. Parsed directly to \
+        networkx.draw_networkx_edges.
     dpi : float
         Controls resolution of output if saved to file.
     kk : int, optional
@@ -92,9 +112,15 @@ def clustree(
 
     Notes
     -------
-    Given data (containing cluster membership for K in 1, ..., kk) and a set of images, plot a graph showing the clustering tree. Edges show samples moving from a cluster at one resolution to a cluster at another resolution. Nodes are displayed as images chosen by user.
+    Given data (containing cluster membership for K in 1, ..., kk) and a set of images,\
+ plot a graph showing the clustering tree. Edges show samples moving from a cluster at \
+ one resolution to a cluster at another resolution. Nodes are displayed as images \
+ chosen by user.
 
-    The directory of images should contain files in format 'K_k.png', where K (in 1, ..., kk) is cluster resolution and k (in 1, ..., K) is cluster number. Alternatively, by setting the parameter min_cluster_number = 0, k is expected to take values in 0, ..., K-1.
+    The directory of images should contain files in format 'K_k.png', where K \
+    (in 1, ..., kk) is cluster resolution and k (in 1, ..., K) is cluster number. \
+    Alternatively, by setting the parameter min_cluster_number = 0, k is expected to \
+    take values in 0, ..., K-1.
     """
 
     _data = handle_data(data=data)
