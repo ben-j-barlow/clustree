@@ -123,7 +123,7 @@ class ClustreeConfig:
                             )
                         ].update(
                             {
-                                "alpha": (float(edge_samples) / float(node_samples)),
+                                "in_prop": (float(edge_samples) / float(node_samples)),
                                 "samples": int(edge_samples),
                                 "start": start_hashed,
                                 "end": end_hashed,

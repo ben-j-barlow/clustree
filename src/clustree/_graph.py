@@ -3,7 +3,6 @@ from typing import Optional
 from networkx import DiGraph
 
 from clustree._clustree_typing import (
-    CIRCLE_POS_TYPE,
     CMAP_TYPE,
     COLOR_AGG_TYPE,
     DATA_INPUT_TYPE,
@@ -61,7 +60,7 @@ def clustree(
         if kk <= 10:
             arrows = True
     if not node_size_edge:
-        node_size_edge = 1.2 * node_size
+        node_size_edge = 2 * node_size
 
     if not layout_reingold_tilford:
         layout_reingold_tilford = False

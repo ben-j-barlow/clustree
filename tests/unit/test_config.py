@@ -51,22 +51,22 @@ def test_set_sample_information_edge(iris_data):
     cf = cfg(kk=3, prefix="K", data=iris_data, _setup_cf=setup_cf)
     assert len(cf.edge_cf) == 6
 
-    # samples and alpha
+    # samples and in_prop
     assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=1, k_start=1)]["samples"] == 70
     assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=2, k_start=1)]["samples"] == 80
 
-    assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=1, k_start=1)]["alpha"] == 1
-    assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=2, k_start=1)]["alpha"] == 1
+    assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=1, k_start=1)]["in_prop"] == 1
+    assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=2, k_start=1)]["in_prop"] == 1
 
     assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=1, k_start=1)]["samples"] == 45
     assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=1)]["samples"] == 25
     assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=2)]["samples"] == 20
     assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=3, k_start=2)]["samples"] == 60
 
-    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=1, k_start=1)]["alpha"] == 1
-    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=1)]["alpha"] == 5 / 9
-    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=2)]["alpha"] == 4 / 9
-    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=3, k_start=2)]["alpha"] == 1
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=1, k_start=1)]["in_prop"] == 1
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=1)]["in_prop"] == 5 / 9
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=2)]["in_prop"] == 4 / 9
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=3, k_start=2)]["in_prop"] == 1
 
     # start and end
     assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=2, k_start=1)][
@@ -101,18 +101,18 @@ def test_set_sample_information_edge(iris_data):
         "start"
     ] == hash_node_id(2, 2)
 
-    assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=1, k_start=1)]["alpha"] == 1
-    assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=2, k_start=1)]["alpha"] == 1
+    assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=1, k_start=1)]["in_prop"] == 1
+    assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=2, k_start=1)]["in_prop"] == 1
 
     assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=1, k_start=1)]["samples"] == 45
     assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=1)]["samples"] == 25
     assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=2)]["samples"] == 20
     assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=3, k_start=2)]["samples"] == 60
 
-    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=1, k_start=1)]["alpha"] == 1
-    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=1)]["alpha"] == 5 / 9
-    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=2)]["alpha"] == 4 / 9
-    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=3, k_start=2)]["alpha"] == 1
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=1, k_start=1)]["in_prop"] == 1
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=1)]["in_prop"] == 5 / 9
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=2)]["in_prop"] == 4 / 9
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=3, k_start=2)]["in_prop"] == 1
 
 
 def test_set_node_color_prefix(iris_data):

@@ -67,6 +67,7 @@ def test_no_border(iris_data):
     )
     add_title_to_fig(path=output, title=title)
 
+
 def test_no_arrows(iris_data):
     output = OUTPUT_DIR + "test_no_arrows"
     title = "Edges should have no arrows"

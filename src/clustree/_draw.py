@@ -203,7 +203,7 @@ def draw_clustree(
     fig, ax = plt.subplots()
 
     colors = get_edge_attributes(dg, "edge_color").values()
-    alpha = get_edge_attributes(dg, "alpha").values()
+    alpha = list(get_edge_attributes(dg, "in_prop").values())
     draw_networkx_edges(
         G=dg,
         pos=pos,
@@ -212,7 +212,7 @@ def draw_clustree(
         arrows=arrows,
         ax=ax,
         edge_color=colors,
-        alpha=list(alpha),
+        alpha=alpha,
     )
     draw_custom_nodes(
         dg=dg,
