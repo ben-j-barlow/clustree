@@ -82,6 +82,7 @@ def clustree(
 * dpi : Controls resolution of output if saved to file.
 * kk : Choose custom depth of clustree graph.
 
+```
 
 ## Glossary
 
