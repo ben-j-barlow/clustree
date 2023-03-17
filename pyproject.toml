@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "clustree"
-version = "0.1.8"
+version = "0.2.0"
 description = "Visualize relationship between clusterings at different resolutions"
 authors = ["Ben Barlow <ben-j-barlow.1@gmail.com>"]
 license = "GPL-3.0-or-later"
