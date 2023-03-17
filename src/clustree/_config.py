@@ -152,14 +152,14 @@ class ClustreeConfig:
             # create to_parse = {node_id: value}
             if use_samples:
                 to_parse = {k: v["samples"] for k, v in self.node_cf.items()}
-                self.node_color_legend_title = "count"
+                self.node_color_legend_title = "node: count"
             else:
                 if not aggr:
                     raise ValueError(
                         "Cannot calculate node color without aggregate function"
                     )
                 self.node_color_legend_title = (
-                    f"{get_aggr_func_name(aggr=aggr)}_{node_color}"
+                    f"node: {get_aggr_func_name(aggr=aggr)}_{node_color}"
                 )
                 to_parse = {
                     hash_node_id(k_upper=k_upper, k_lower=k_lower): float(val)
@@ -195,7 +195,7 @@ class ClustreeConfig:
             # convert to_parse to {edge_id: color}
             rgba, sm = data_to_color(data=to_parse, cmap=cmap)
             self.edge_color_sm = sm
-            self.edge_color_legend_title = "count"
+            self.edge_color_legend_title = "edge: count"
 
             for k, v in rgba.items():
                 self.edge_cf[k]["edge_color"] = v
