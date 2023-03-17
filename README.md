@@ -5,16 +5,16 @@
 **Functionality: Implemented**
 
 * Directed graph representing clustree. Nodes are parsed images and node information is encoded by a border surronding the image.
-* Data and images provided directly or through a path to parent directory.
-* Edge and node color can correspond to one of: #samples that pass through edge/node, cluster resolution `K`, or a fixed color. In the case of node color, a column name in the data and aggregate function can be used too. Use of column name and #samples creates a continuous colormap, whilst the other options result in discrete colors.
-* Reingold-Tilford algorithm used for node positioning. Not recommended for kk > 12 due to memory bottleneck in igraph dependency.
+* Loading: Data provided directly or through a path to parent directory. Images provided through a path to parent directory.
+* Appearance: Edge and node color can correspond to one of: #samples that pass through edge/node, cluster resolution `K`, or a fixed color. In the case of node color, a column name in the data and aggregate function can be used too. Use of column name and #samples creates a continuous colormap, whilst the other options result in discrete colors.
+* Layout: Reingold-Tilford algorithm used for node positioning. Not recommended for kk > 12 due to memory bottleneck in igraph dependency.
 * Legend: demonstration of node / edge color.
 
 
 **Functionality: To Add**
 
 * Legend: demonstration of transparency of edges.
-* Bespoke implementation of Reingold-Tilford algorithm to overcome dependency's memory bottleneck.
+* Layout: Bespoke implementation of Reingold-Tilford algorithm to overcome dependency's memory bottleneck.
 
 ## Usage
 
@@ -61,6 +61,8 @@ def clustree(
 ) -> DiGraph:
     """
 
+```
+
 * data : Path of csv or DataFrame object.
 * prefix : String indicating columns containing clustering information.
 * images : Path of directory that contains images.
@@ -81,8 +83,6 @@ def clustree(
 * node_size_edge: Controls edge start and end point. Parsed directly to networkx.draw_networkx_edges.
 * dpi : Controls resolution of output if saved to file.
 * kk : Choose custom depth of clustree graph.
-
-```
 
 ## Glossary
 
