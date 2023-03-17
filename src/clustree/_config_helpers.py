@@ -3,6 +3,14 @@ from typing import Union
 import matplotlib as mpl
 from matplotlib.cm import ScalarMappable
 
+from clustree._clustree_typing import COLOR_AGG_TYPE
+
+
+def get_aggr_func_name(aggr: COLOR_AGG_TYPE) -> str:
+    if isinstance(aggr, str):
+        return aggr
+    return aggr.__name__
+
 
 def data_to_color(
     data: dict[int, Union[int, float]],

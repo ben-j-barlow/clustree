@@ -1,10 +1,11 @@
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Optional
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from matplotlib.cm import ScalarMappable
 
 from clustree._clustree_typing import (
     CMAP_TYPE,
@@ -14,7 +15,7 @@ from clustree._clustree_typing import (
     NODE_COLOR_TYPE,
     NODE_CONFIG_TYPE,
 )
-from clustree._config_helpers import data_to_color
+from clustree._config_helpers import data_to_color, get_aggr_func_name
 from clustree._hash import hash_edge_id, hash_node_id
 
 CONTROL_LIST = ["init", "sample_info", "node_color", "edge_color"]
@@ -52,7 +53,10 @@ class ClustreeConfig:
         self.node_cf: NODE_CONFIG_TYPE = defaultdict(dict)
         self.edge_cf: EDGE_CONFIG_TYPE = defaultdict(dict)
         self.k_upper_to_node_id: dict[int, list[int]] = {}
-        self.node_color_cf: dict[str, Any] = dict()
+        self.node_color_sm: Optional[ScalarMappable] = None
+        self.edge_color_sm: Optional[ScalarMappable] = None
+        self.node_color_legend_title: Optional[str] = None
+        self.edge_color_legend_title: Optional[str] = None
 
         self.membership_cols = [
             f"{prefix}{str(k_upper)}" for k_upper in range(1, kk + 1)
@@ -148,11 +152,15 @@ class ClustreeConfig:
             # create to_parse = {node_id: value}
             if use_samples:
                 to_parse = {k: v["samples"] for k, v in self.node_cf.items()}
+                self.node_color_legend_title = "count"
             else:
                 if not aggr:
                     raise ValueError(
                         "Cannot calculate node color without aggregate function"
                     )
+                self.node_color_legend_title = (
+                    f"{get_aggr_func_name(aggr=aggr)}_{node_color}"
+                )
                 to_parse = {
                     hash_node_id(k_upper=k_upper, k_lower=k_lower): float(val)
                     for k_upper, cluster_col in enumerate(self.membership_cols, 1)
@@ -164,6 +172,7 @@ class ClustreeConfig:
 
             # convert to_parse to {node_id: color}
             rgba, sm = data_to_color(data=to_parse, cmap=cmap)
+            self.node_color_sm = sm
             for k, v in rgba.items():
                 self.node_cf[k]["node_color"] = v
         else:  # fixed color, e.g., mpl.colors object
@@ -185,6 +194,9 @@ class ClustreeConfig:
 
             # convert to_parse to {edge_id: color}
             rgba, sm = data_to_color(data=to_parse, cmap=cmap)
+            self.edge_color_sm = sm
+            self.edge_color_legend_title = "count"
+
             for k, v in rgba.items():
                 self.edge_cf[k]["edge_color"] = v
         else:  # fixed color, e.g., mpl.colors object

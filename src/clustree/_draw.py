@@ -1,10 +1,11 @@
-from typing import Sequence, Union
+from typing import Optional, Sequence, Union
 
 import cv2
 import igraph as ig
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
+from matplotlib.cm import ScalarMappable
 from matplotlib.path import get_path_collection_extents
 from networkx import DiGraph, draw_networkx_edges, get_edge_attributes
 
@@ -177,6 +178,30 @@ def draw_custom_nodes(
     ax.autoscale()
 
 
+def add_legend(
+    fig: plt.Figure,
+    ax: plt.Axes,
+    node_color_sm: Optional[ScalarMappable],
+    edge_color_sm: Optional[ScalarMappable],
+    node_color_title: str,
+    edge_color_title: str,
+):
+    if node_color_sm:
+        cbar = fig.colorbar(
+            node_color_sm,
+            ax=ax,
+            shrink=0.8,
+        )
+        cbar.set_label(node_color_title)
+    if edge_color_sm:
+        cbar = fig.colorbar(
+            edge_color_sm,
+            ax=ax,
+            shrink=0.8,
+        )
+        cbar.set_label(edge_color_title)
+
+
 def draw_clustree(
     dg: DiGraph,
     path: OUTPUT_PATH_TYPE,
@@ -188,6 +213,10 @@ def draw_clustree(
     node_size_edge,
     arrows: bool,
     border_size: float,
+    node_color_sm: Optional[ScalarMappable],
+    edge_color_sm: Optional[ScalarMappable],
+    node_color_title: str,
+    edge_color_title: str,
     dpi: int = 500,
 ):
 
@@ -220,6 +249,14 @@ def draw_clustree(
         path=images,
         ax=ax,
         border_size_prop=border_size,
+    )
+    add_legend(
+        fig=fig,
+        ax=ax,
+        node_color_sm=node_color_sm,
+        edge_color_sm=edge_color_sm,
+        node_color_title=node_color_title,
+        edge_color_title=edge_color_title,
     )
     if path:
         plt.savefig(path, dpi=dpi, bbox_inches="tight")

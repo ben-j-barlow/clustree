@@ -93,6 +93,10 @@ def clustree(
             dpi=dpi,
             border_size=border_size,
             arrows=arrows,
+            node_color_sm=config.node_color_sm,
+            edge_color_sm=config.edge_color_sm,
+            node_color_title=config.node_color_legend_title,
+            edge_color_title=config.edge_color_legend_title,
         )
     return dg
 
