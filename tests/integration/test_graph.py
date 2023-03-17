@@ -37,3 +37,46 @@ def test_orientation_horizontal(iris_data):
         orientation="horizontal",
     )
     add_title_to_fig(path=output, title=title)
+
+
+def test_node_size(iris_data):
+    output = OUTPUT_DIR + "test_node_size"
+    title = "Node size small"
+    clustree(
+        data=iris_data,
+        prefix="K",
+        images=INPUT_DIR,
+        output_path=output,
+        node_size=100,
+        node_size_edge=300,
+    )
+    add_title_to_fig(path=output, title=title)
+
+
+def test_no_border(iris_data):
+    output = OUTPUT_DIR + "test_no_border"
+    title = "Nodes should have no border"
+    clustree(
+        data=iris_data,
+        prefix="K",
+        images=INPUT_DIR,
+        output_path=output,
+        node_size=100,
+        node_size_edge=300,
+        border_size=0,
+    )
+    add_title_to_fig(path=output, title=title)
+
+def test_no_arrows(iris_data):
+    output = OUTPUT_DIR + "test_no_arrows"
+    title = "Edges should have no arrows"
+    clustree(
+        data=iris_data,
+        prefix="K",
+        images=INPUT_DIR,
+        output_path=output,
+        node_size=100,
+        node_size_edge=300,
+        arrows=False,
+    )
+    add_title_to_fig(path=output, title=title)

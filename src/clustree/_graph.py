@@ -31,89 +31,21 @@ def clustree(
     edge_color: EDGE_COLOR_TYPE = "samples",
     edge_cmap: CMAP_TYPE = None,
     orientation: ORIENTATION_INPUT_TYPE = "vertical",
+    layout_reingold_tilford: bool = None,
     min_cluster_number: MIN_CLUSTER_NUMBER_TYPE = 1,
-    pos: CIRCLE_POS_TYPE = "tr",
+    border_size: float = 0.05,
     figsize=None,
-    node_size=300,
-    dpi=1000,
+    arrows=None,
+    node_size: float = 300,
+    node_size_edge: float = None,
+    dpi=500,
     kk: Optional[int] = None,
 ) -> DiGraph:
-    """
-    Create a plot of a clustering tree showing the relationship between clusterings \
-    at different resolutions.
 
-    Parameters
-    ----------
-    data : Union[str, Path, DataFrame]
-        Path of csv or DataFrame object.
-    prefix : str
-        String indicating columns containing clustering information.
-    images : Union[str, Path, dict[str, ndarray]
-        String indicating directory containing images. See more information on \
-         files expected in directory in Notes.
-    output_path : Union[str, Path], optional
-        Directory to output the final plot to. If None, then output not wrriten to file.
-    draw : bool, optional
-        Whether to draw the clustree. Defaults to True. If False and output_path \
-        supplied, will be overridden. Saving to file requires drawing.
-    node_color : Any, optional
-        For continuous colormap, use 'samples' or the name of a metadata column to \
-        color nodes by. For discrete colors, coloring by cluster resolution can be \
-        achieved by parsing 'prefix' or the same value parsed to the prefix parameter. \
-        Finally, it is possible to specify a fixed color (see Specifying colors in \
-        Matplotlib tutorial here: \
-        https://matplotlib.org/stable/tutorials/colors/colors.html). If None, default \
-        set to 'prefix' to color by resolution.
-    node_color_aggr : Union[Callable, str], optional
-        If node_color is a column name then a function or string giving the name of a \
-        function to aggregate that column for samples in each cluster.
-    node_cmap : Union[mpl.colors.Colormap, str], optional
-        If node_color is 'samples' or a column name then a colourmap to use (see \
-        Colormap Matplotlib tutorial here: \
-        https://matplotlib.org/stable/tutorials/colors/colormaps.html).
-    edge_color : Any, optional
-        For continuous colormap, use 'samples'. For discrete colors, use 'prefix' to \
-        color by resolution or specify a fixed color (see Specifying colors in \
-        Matplotlib tutorial here: \
-        https://matplotlib.org/stable/tutorials/colors/colors.html). If None, default \
-        set to 'samples'.
-    edge_cmap : Union[mpl.colors.Colormap, str], optional
-        If edge_color is 'samples' then a colourmap to use (see Colormap Matplotlib \
-        tutorial here: https://matplotlib.org/stable/tutorials/colors/colormaps.html).
-    errors : bool, optional
-        Whether to raise an error if an image is missing from directory supplied to
-        images parameter. If False, a fake image will be created with text 'K_k' \
-        where K is cluster resolution and k is cluster number. Defaults to False.
-    orientation : Literal['vertical', 'horizontal'], optional
-        'vertical' or 'horizontal' to control orientation in which samples flow \
-        through the graph. Defaults to 'vertical'.
-    min_cluster_number : Literal[0, 1], optional
-        Indicates if cluster numbers are 0,...,(K-1) or 1,...,K.
-
-    Returns
-    -------
-    DiGraph
-        The directed graph that represents the clustree.
-
-    Notes
-    -------
-    The function must be supplied (a directory for) data, a prefix that indicates \
-    where to find cluster membership, and (a directory for) images.
-
-    The function that reads images from given directory will determine maximum cluster \
-    resolution kk from the data and look for files named 'K_k' with 1 <= K <= kk and, \
-    for each K, 1 <= k <= K. There are requirements on the images in the directory:
-
-        - Their file name must be K_k.png.
-        - K is cluster resolution and k is cluster number.
-        - Only .png files are accepted.
-        - If a file or more is missing, behaviour will depend on errors parameter.
-        - Other files in the directory will be ignored.
-
-    """
     _data = handle_data(data=data)
     kk = get_and_check_cluster_cols(cols=_data.columns, prefix=prefix, user_kk=kk)
 
+    border_size = float(border_size)
     images = str(images)
     if images[-1] != "/":
         images = images + "/"
@@ -124,6 +56,17 @@ def clustree(
         else:
             w = min([kk, 20]) / 2
             figsize = (w, w)
+    if arrows is None:
+        arrows = False
+        if kk <= 10:
+            arrows = True
+    if not node_size_edge:
+        node_size_edge = 1.2 * node_size
+
+    if not layout_reingold_tilford:
+        layout_reingold_tilford = False
+        if kk < 10:
+            layout_reingold_tilford = True
 
     config = ClustreeConfig(
         prefix=prefix,
@@ -143,10 +86,14 @@ def clustree(
             dg=dg,
             path=output_path,
             orientation=orientation,
+            rt_layout=layout_reingold_tilford,
             images=images,
             figsize=figsize,
             node_size=node_size,
+            node_size_edge=node_size_edge,
             dpi=dpi,
+            border_size=border_size,
+            arrows=arrows,
         )
     return dg
 

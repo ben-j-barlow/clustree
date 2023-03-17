@@ -3,9 +3,10 @@ from typing import Sequence, Union
 import cv2
 import igraph as ig
 import matplotlib.pyplot as plt
+import networkx as nx
 import numpy as np
 from matplotlib.path import get_path_collection_extents
-from networkx import DiGraph, draw_networkx_edges
+from networkx import DiGraph, draw_networkx_edges, get_edge_attributes
 
 from clustree._clustree_typing import (
     IMAGE_INPUT_TYPE,
@@ -19,20 +20,27 @@ def ig_node_name_to_id(name, g):
 
 
 def get_pos(
-    dg: DiGraph, orientation: ORIENTATION_INPUT_TYPE
+    dg: DiGraph, orientation: ORIENTATION_INPUT_TYPE, rt_layout: bool
 ) -> dict[int, tuple[float, float]]:
-    g = ig.Graph()
-    nodes = list(dg.nodes)
-    g.add_vertices(n=nodes)
-    edges = list(dg.edges)
-    ls_as_id = [
-        (ig_node_name_to_id(name=node_from, g=g), ig_node_name_to_id(name=node_to, g=g))
-        for node_from, node_to in edges
-    ]
-    g.add_edges(ls_as_id)
-    layout = g.layout_reingold_tilford(root=[0])
-    pos = {k: v for k, v in zip(nodes, layout.coords)}
 
+    if rt_layout:
+        nodes = list(dg.nodes)
+        edges = list(dg.edges)
+
+        g = ig.Graph()
+        g.add_vertices(n=nodes)
+        ls_as_id = [
+            (
+                ig_node_name_to_id(name=node_from, g=g),
+                ig_node_name_to_id(name=node_to, g=g),
+            )
+            for node_from, node_to in edges
+        ]
+        g.add_edges(ls_as_id)
+        layout = g.layout_reingold_tilford(root=[0])
+        pos = {k: v for k, v in zip(nodes, layout.coords)}
+    else:
+        pos = nx.multipartite_layout(dg, "res")
     x_vals, y_vals = [v[0] for k, v in pos.items()], [v[1] for k, v in pos.items()]
     min_y, max_y = min(y_vals), max(y_vals)
     min_x, max_x = min(x_vals), max(x_vals)
@@ -90,16 +98,15 @@ def bb_to_extent(bb):
     return (l, r, b, t)
 
 
-def get_nodes_bbox(dg, pos, figsize, node_size):
+def get_nodes_bbox(dg, pos, figsize, node_size, node_size_edge):
     fig, ax = plt.subplots(figsize=figsize)
 
     # draw_edges
-    draw_networkx_edges(G=dg, pos=pos, node_shape="s", node_size=node_size, ax=ax)
+    draw_networkx_edges(G=dg, pos=pos, node_shape="s", node_size=node_size_edge, ax=ax)
 
     # draw scatter
     nodelist = list(dg)
     xy = np.asarray([pos[v] for v in nodelist])
-    node_size = 300
     node_color = "#1f78b4"
     alpha = None
     cmap = None
@@ -135,13 +142,38 @@ def get_nodes_bbox(dg, pos, figsize, node_size):
 
 
 def draw_custom_nodes(
-    dg: DiGraph, extent: Sequence[float], path: IMAGE_INPUT_TYPE, ax: plt.Axes
+    dg: DiGraph,
+    extent: Sequence[float],
+    path: IMAGE_INPUT_TYPE,
+    ax: plt.Axes,
+    border_size_prop: float,
 ):
     for node_id, attr in dg.nodes.data():
         file_name: str = f"{attr['res']}_{attr['k']}.png"
         img_path = path + file_name
         img = cv2.imread(img_path)
-        ax.imshow(img, extent=extent[node_id], aspect=1, origin="upper", zorder=2)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        if border_size_prop == float(0):
+            ax.imshow(img, extent=extent[node_id], aspect=1, origin="upper", zorder=2)
+        else:
+            border_size = int(img.shape[0] * border_size_prop)
+            border_color = tuple(val * 255 for val in attr["node_color"])
+            img_with_border = cv2.copyMakeBorder(
+                img,
+                border_size,
+                border_size,
+                border_size,
+                border_size,
+                cv2.BORDER_CONSTANT,
+                value=border_color,
+            )
+            ax.imshow(
+                img_with_border,
+                extent=extent[node_id],
+                aspect=1,
+                origin="upper",
+                zorder=2,
+            )
     ax.autoscale()
 
 
@@ -150,18 +182,45 @@ def draw_clustree(
     path: OUTPUT_PATH_TYPE,
     images: IMAGE_INPUT_TYPE,
     orientation: ORIENTATION_INPUT_TYPE,
+    rt_layout: bool,
     figsize: tuple[Union[int, float], Union[int, float]],
     node_size: Union[int, float],
-    dpi: int,
+    node_size_edge,
+    arrows: bool,
+    border_size: float,
+    dpi: int = 500,
 ):
-    pos = get_pos(dg=dg, orientation=orientation)
-    extent = get_nodes_bbox(dg=dg, pos=pos, figsize=figsize, node_size=node_size)
+
+    pos = get_pos(dg=dg, orientation=orientation, rt_layout=rt_layout)
+    extent = get_nodes_bbox(
+        dg=dg,
+        pos=pos,
+        figsize=figsize,
+        node_size=node_size,
+        node_size_edge=node_size_edge,
+    )
 
     fig, ax = plt.subplots()
+
+    colors = get_edge_attributes(dg, "edge_color").values()
+    alpha = get_edge_attributes(dg, "alpha").values()
     draw_networkx_edges(
-        G=dg, pos=pos, node_shape="s", node_size=node_size, arrows=False, ax=ax
+        G=dg,
+        pos=pos,
+        node_shape="s",
+        node_size=node_size_edge,
+        arrows=arrows,
+        ax=ax,
+        edge_color=colors,
+        alpha=list(alpha),
     )
-    draw_custom_nodes(dg=dg, extent=extent, path=images, ax=ax)
+    draw_custom_nodes(
+        dg=dg,
+        extent=extent,
+        path=images,
+        ax=ax,
+        border_size_prop=border_size,
+    )
     if path:
         plt.savefig(path, dpi=dpi, bbox_inches="tight")
-    plt.close()
+    plt.close(fig)
