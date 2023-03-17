@@ -34,7 +34,7 @@ def test_set_node_color_samples(iris_data):
 
 
 def test_set_node_color_agg(iris_data):
-    title = "Node colour by sepal_legnth summed, with colorbar"
+    title = "Node colour by sepal_legnth mean, with colorbar"
     output = OUTPUT_DIR + "cfg_node_col_agg"
     clustree(
         prefix="K",
