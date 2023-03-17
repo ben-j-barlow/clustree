@@ -171,7 +171,7 @@ def draw_custom_nodes(
             ax.imshow(
                 img_with_border,
                 extent=extent[node_id],
-                aspect=1,
+                aspect="equal",
                 origin="upper",
                 zorder=2,
             )
@@ -208,16 +208,16 @@ def draw_clustree(
     images: IMAGE_INPUT_TYPE,
     orientation: ORIENTATION_INPUT_TYPE,
     rt_layout: bool,
-    figsize: tuple[Union[int, float], Union[int, float]],
-    node_size: Union[int, float],
-    node_size_edge,
+    figsize: tuple[float, float],
+    node_size: float,
+    node_size_edge: float,
     arrows: bool,
     border_size: float,
     node_color_sm: Optional[ScalarMappable],
     edge_color_sm: Optional[ScalarMappable],
     node_color_title: str,
     edge_color_title: str,
-    dpi: int = 500,
+    dpi: float,
 ):
 
     pos = get_pos(dg=dg, orientation=orientation, rt_layout=rt_layout)
