@@ -48,6 +48,11 @@ def get_pos(
 
     norm_x = [(x - min_x) / (max_x - min_x) for x in x_vals]
     norm_y = [(y - min_y) / (max_y - min_y) for y in y_vals]
+
+    if not rt_layout:
+        if orientation == "vertical":
+            return {k: (y, 1 - x) for k, x, y in zip(list(pos.keys()), norm_x, norm_y)}
+        return {k: (x, 1 - y) for k, x, y in zip(list(pos.keys()), norm_x, norm_y)}
     if orientation == "vertical":
         return {k: (x, 1 - y) for k, x, y in zip(list(pos.keys()), norm_x, norm_y)}
     return {k: (y, x) for k, x, y in zip(list(pos.keys()), norm_x, norm_y)}
