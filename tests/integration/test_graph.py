@@ -3,6 +3,14 @@ from pathlib import Path
 from clustree._graph import clustree
 from tests.helpers import INPUT_DIR, OUTPUT_DIR, add_title_to_fig
 
+def test_clustree_default(datafiles, iris_data):
+    # images as str
+    clustree(
+        data=iris_data,
+        prefix="K",
+        images=INPUT_DIR,
+        output_path=OUTPUT_DIR + "test_default.png",
+    )
 
 def test_clustree_draw_str(datafiles, iris_data):
     # images as str
