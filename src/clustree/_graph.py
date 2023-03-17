@@ -60,7 +60,7 @@ def clustree(
         if kk <= 10:
             arrows = True
     if not node_size_edge:
-        node_size_edge = 2 * node_size
+        node_size_edge = 3 * node_size
 
     if not layout_reingold_tilford:
         layout_reingold_tilford = False
