@@ -1,19 +1,18 @@
-import copy
-
 import matplotlib as mpl
 import pytest
 
+from clustree._config import CONTROL_LIST
 from clustree._config import ClustreeConfig as cfg
-from clustree._config import control_list, data_to_color
+from clustree._config import data_to_color
 from clustree._hash import hash_edge_id, hash_node_id
 
-test_setup_config = {k: False for k in control_list}
+DEFAULT_CONFIG = {k: False for k in CONTROL_LIST}
 
 
 def test_init_cf(iris_data):
-    setup_cf = copy.copy(test_setup_config)
+    setup_cf = DEFAULT_CONFIG
     setup_cf["init"] = True
-    cf = cfg(kk=3, prefix="K", data=iris_data, image_cf=None, _setup_cf=setup_cf)
+    cf = cfg(kk=3, prefix="K", data=iris_data, _setup_cf=setup_cf)
     assert cf.node_cf[hash_node_id(1, 1)]["k"] == 1
     assert cf.node_cf[hash_node_id(1, 1)]["res"] == 1
 
@@ -31,9 +30,9 @@ def test_init_cf(iris_data):
 
 
 def test_set_sample_information_node(iris_data):
-    setup_cf = test_setup_config
+    setup_cf = DEFAULT_CONFIG
     setup_cf["sample_info"] = True
-    cf = cfg(kk=3, prefix="K", data=iris_data, image_cf=None, _setup_cf=setup_cf)
+    cf = cfg(kk=3, prefix="K", data=iris_data, _setup_cf=setup_cf)
     assert len(cf.node_cf) == 6
 
     assert cf.node_cf[hash_node_id(1, 1)]["samples"] == 150
@@ -47,27 +46,27 @@ def test_set_sample_information_node(iris_data):
 
 
 def test_set_sample_information_edge(iris_data):
-    setup_cf = test_setup_config
+    setup_cf = DEFAULT_CONFIG
     setup_cf["sample_info"] = True
-    cf = cfg(kk=3, prefix="K", data=iris_data, image_cf=None, _setup_cf=setup_cf)
+    cf = cfg(kk=3, prefix="K", data=iris_data, _setup_cf=setup_cf)
     assert len(cf.edge_cf) == 6
 
-    # samples and alpha
+    # samples and in_prop
     assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=1, k_start=1)]["samples"] == 70
     assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=2, k_start=1)]["samples"] == 80
 
-    assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=1, k_start=1)]["alpha"] == 1
-    assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=2, k_start=1)]["alpha"] == 1
+    assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=1, k_start=1)]["in_prop"] == 1
+    assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=2, k_start=1)]["in_prop"] == 1
 
     assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=1, k_start=1)]["samples"] == 45
     assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=1)]["samples"] == 25
     assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=2)]["samples"] == 20
     assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=3, k_start=2)]["samples"] == 60
 
-    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=1, k_start=1)]["alpha"] == 1
-    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=1)]["alpha"] == 5 / 9
-    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=2)]["alpha"] == 4 / 9
-    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=3, k_start=2)]["alpha"] == 1
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=1, k_start=1)]["in_prop"] == 1
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=1)]["in_prop"] == 5 / 9
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=2)]["in_prop"] == 4 / 9
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=3, k_start=2)]["in_prop"] == 1
 
     # start and end
     assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=2, k_start=1)][
@@ -102,43 +101,41 @@ def test_set_sample_information_edge(iris_data):
         "start"
     ] == hash_node_id(2, 2)
 
-    assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=1, k_start=1)]["alpha"] == 1
-    assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=2, k_start=1)]["alpha"] == 1
+    assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=1, k_start=1)]["in_prop"] == 1
+    assert cf.edge_cf[hash_edge_id(k_upper=2, k_end=2, k_start=1)]["in_prop"] == 1
 
     assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=1, k_start=1)]["samples"] == 45
     assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=1)]["samples"] == 25
     assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=2)]["samples"] == 20
     assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=3, k_start=2)]["samples"] == 60
 
-    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=1, k_start=1)]["alpha"] == 1
-    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=1)]["alpha"] == 5 / 9
-    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=2)]["alpha"] == 4 / 9
-    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=3, k_start=2)]["alpha"] == 1
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=1, k_start=1)]["in_prop"] == 1
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=1)]["in_prop"] == 5 / 9
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=2, k_start=2)]["in_prop"] == 4 / 9
+    assert cf.edge_cf[hash_edge_id(k_upper=3, k_end=3, k_start=2)]["in_prop"] == 1
 
 
 def test_set_node_color_prefix(iris_data):
-    setup_cf = test_setup_config
+    setup_cf = DEFAULT_CONFIG
     setup_cf.update({"init": True, "node_color": True})
     cf = cfg(
         kk=3,
         prefix="K",
         data=iris_data,
-        image_cf=None,
         _setup_cf=setup_cf,
         node_color="K",
     )
-    exp = [f"C{res}" for res in [1, 2, 2, 3, 3, 3]]
+    exp = [mpl.colors.to_rgba(f"C{res}") for res in [1, 2, 2, 3, 3, 3]]
     assert [cf.node_cf[k]["node_color"] for k in cf.node_cf] == exp
 
 
 def test_set_node_color_samples(iris_data):
-    setup_cf = test_setup_config
+    setup_cf = DEFAULT_CONFIG
     setup_cf.update({"sample_info": True, "node_color": True})
     cf = cfg(
         kk=3,
         prefix="K",
         data=iris_data,
-        image_cf=None,
         _setup_cf=setup_cf,
         node_color="samples",
         node_cmap=mpl.cm.Blues,
@@ -165,7 +162,7 @@ def test_set_node_color_samples(iris_data):
 
 
 def test_set_node_color_agg(iris_data):
-    setup_cf = test_setup_config
+    setup_cf = DEFAULT_CONFIG
     setup_cf.update({"sample_info": True, "node_color": True})
 
     # produce expected
@@ -187,7 +184,6 @@ def test_set_node_color_agg(iris_data):
         kk=3,
         prefix="K",
         data=iris_data,
-        image_cf=None,
         _setup_cf=setup_cf,
         node_color="sepal_length",
         node_color_aggr=sum,
@@ -202,7 +198,6 @@ def test_set_node_color_agg(iris_data):
         kk=3,
         prefix="K",
         data=iris_data,
-        image_cf=None,
         _setup_cf=setup_cf,
         node_color="sepal_length",
         node_color_aggr="sum",
@@ -214,24 +209,22 @@ def test_set_node_color_agg(iris_data):
 
 
 def test_set_node_color_no_agg_chosen(iris_data):
-    setup_cf = test_setup_config
+    setup_cf = DEFAULT_CONFIG
     setup_cf.update({"sample_info": True, "node_color": True})
     with pytest.raises(ValueError):
-        cf = cfg(
+        cfg(
             kk=3,
             prefix="K",
             data=iris_data,
-            image_cf=None,
             _setup_cf=setup_cf,
             node_color="sepal_length",
             node_cmap=mpl.cm.Blues,
         )
     with pytest.raises(ValueError):
-        cf = cfg(
+        cfg(
             kk=3,
             prefix="K",
             data=iris_data,
-            image_cf=None,
             _setup_cf=setup_cf,
             node_color="sepal_length",
             node_color_aggr=None,
@@ -240,29 +233,27 @@ def test_set_node_color_no_agg_chosen(iris_data):
 
 
 def test_set_node_color_fixed(iris_data):
-    setup_cf = test_setup_config
+    setup_cf = DEFAULT_CONFIG
     setup_cf.update({"sample_info": True, "node_color": True})
     cf = cfg(
         kk=3,
         prefix="K",
         data=iris_data,
-        image_cf=None,
         _setup_cf=setup_cf,
         node_color="C1",
     )
     act_color = [v["node_color"] for k, v in cf.node_cf.items()]
-    assert all([isinstance(v["node_color"], str) for k, v in cf.node_cf.items()])
-    assert act_color == ["C1" for _ in range(6)]
+    assert all([isinstance(ele["node_color"], tuple) for ele in cf.node_cf.values()])
+    assert act_color == [mpl.colors.to_rgba("C1") for _ in range(6)]
 
 
 def test_set_edge_color_prefix(iris_data):
-    setup_cf = test_setup_config
+    setup_cf = DEFAULT_CONFIG
     setup_cf.update({"sample_info": True, "edge_color": True})
     cf = cfg(
         kk=3,
         prefix="K",
         data=iris_data,
-        image_cf=None,
         _setup_cf=setup_cf,
         edge_color="K",
     )
@@ -271,13 +262,12 @@ def test_set_edge_color_prefix(iris_data):
 
 
 def test_set_edge_color_samples(iris_data):
-    setup_cf = test_setup_config
+    setup_cf = DEFAULT_CONFIG
     setup_cf.update({"sample_info": True, "edge_color": True})
     cf = cfg(
         kk=3,
         prefix="K",
         data=iris_data,
-        image_cf=None,
         _setup_cf=setup_cf,
         edge_color="samples",
     )
@@ -306,13 +296,12 @@ def test_set_edge_color_samples(iris_data):
 
 
 def test_set_edge_color_fixed(iris_data):
-    setup_cf = test_setup_config
+    setup_cf = DEFAULT_CONFIG
     setup_cf.update({"sample_info": True, "edge_color": True})
     cf = cfg(
         kk=3,
         prefix="K",
         data=iris_data,
-        image_cf=None,
         _setup_cf=setup_cf,
         edge_color="C1",
     )

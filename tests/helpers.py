@@ -1,3 +1,4 @@
+import cv2
 import matplotlib.pyplot as plt
 
 INPUT_DIR = "tests/data/input/"
@@ -6,7 +7,7 @@ OUTPUT_DIR = "tests/data/output/"
 
 
 def add_title_to_fig(path: str, title: str) -> None:
-    to_edit = plt.imread(path + ".png")
+    to_edit = cv2.imread(path + ".png")
     fig, ax = plt.subplots()
     ax.imshow(to_edit)
     fig.suptitle(title, fontsize=6)
