@@ -1,40 +1,15 @@
-import tempfile
 from typing import Union
 
 import matplotlib as mpl
-import matplotlib.pyplot as plt
-import numpy as np
 from matplotlib.cm import ScalarMappable
 
+from clustree._clustree_typing import COLOR_AGG_TYPE
 
-def draw_circle(
-    img: np.ndarray,
-    node_color: str,
-    radius: float = 0.1,
-    img_width: int = 100,
-    img_height: int = 100,
-) -> np.ndarray:
-    fig, ax = plt.subplots()
-    ax.imshow(img, extent=[0, img_width, 0, img_height])
 
-    # Calculate radius and coordinates
-    radius *= img_width
-    x0 = img_width - radius
-    y0 = img_height - radius
-
-    # Add a circle at the top right of the image
-    circle = plt.Circle((x0, y0), radius=radius, fill=True, color=node_color)
-    ax.add_artist(circle)
-
-    # save and read in
-    fig.patch.set_visible(False)
-    ax.axis("off")
-    with tempfile.NamedTemporaryFile(suffix=".png") as f:
-        file_path = f.name
-        plt.savefig(file_path, dpi=200, bbox_inches="tight")
-        to_return = plt.imread(file_path)
-        plt.close()
-        return to_return
+def get_aggr_func_name(aggr: COLOR_AGG_TYPE) -> str:
+    if isinstance(aggr, str):
+        return aggr
+    return aggr.__name__
 
 
 def data_to_color(

@@ -19,7 +19,7 @@ def test_set_node_color_prefix(iris_data):
 
 
 def test_set_node_color_samples(iris_data):
-    title = "Node colour by samples, colorbar to add"
+    title = "Node colour by samples with colorbar"
     output = OUTPUT_DIR + "cfg_node_col_samples"
     clustree(
         data=iris_data,
@@ -34,7 +34,7 @@ def test_set_node_color_samples(iris_data):
 
 
 def test_set_node_color_agg(iris_data):
-    title = "Node colour by sepal_legnth summed, colorbar to add"
+    title = "Node colour by sepal_legnth summed, with colorbar"
     output = OUTPUT_DIR + "cfg_node_col_agg"
     clustree(
         prefix="K",

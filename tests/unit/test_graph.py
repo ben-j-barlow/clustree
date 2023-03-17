@@ -2,7 +2,8 @@ import os
 import tempfile
 from pathlib import Path
 
-from clustree import clustree, hash_node_id
+from clustree._graph import clustree
+from clustree._hash import hash_node_id
 from tests.helpers import INPUT_DIR
 
 
@@ -20,6 +21,30 @@ def test_clustree(iris_data):
         (hash_node_id(2, 1), hash_node_id(3, 2)),
         (hash_node_id(2, 2), hash_node_id(3, 2)),
         (hash_node_id(2, 2), hash_node_id(3, 3)),
+    }
+
+
+def test_clustree_start_at_0(iris_data_0):
+    min_k_lower = 0
+    assert min_k_lower == 0
+    dg = clustree(
+        data=iris_data_0,
+        prefix="K",
+        images=INPUT_DIR,
+        draw=False,
+        output_path=None,
+        min_cluster_number=min_k_lower,
+    )
+
+    assert dg.number_of_edges() == 6
+    assert dg.number_of_nodes() == 6
+    assert set(dg.edges) == {
+        (hash_node_id(1, 0), hash_node_id(2, 0)),
+        (hash_node_id(1, 0), hash_node_id(2, 1)),
+        (hash_node_id(2, 0), hash_node_id(3, 0)),
+        (hash_node_id(2, 0), hash_node_id(3, 1)),
+        (hash_node_id(2, 1), hash_node_id(3, 1)),
+        (hash_node_id(2, 1), hash_node_id(3, 2)),
     }
 
 

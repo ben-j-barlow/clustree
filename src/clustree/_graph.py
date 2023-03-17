@@ -1,11 +1,6 @@
-import matplotlib.pyplot as plt
-import numpy as np
-from networkx import (
-    DiGraph,
-    draw_networkx_edges,
-    get_edge_attributes,
-    multipartite_layout,
-)
+from typing import Optional
+
+from networkx import DiGraph
 
 from clustree._clustree_typing import (
     CMAP_TYPE,
@@ -13,12 +8,14 @@ from clustree._clustree_typing import (
     DATA_INPUT_TYPE,
     EDGE_COLOR_TYPE,
     IMAGE_INPUT_TYPE,
+    MIN_CLUSTER_NUMBER_TYPE,
     NODE_COLOR_TYPE,
     ORIENTATION_INPUT_TYPE,
     OUTPUT_PATH_TYPE,
 )
 from clustree._config import ClustreeConfig
-from clustree._handle_pars import get_and_check_cluster_cols, handle_data, handle_images
+from clustree._draw import draw_clustree
+from clustree._handle_pars import get_and_check_cluster_cols, handle_data
 
 
 def clustree(
@@ -29,88 +26,104 @@ def clustree(
     draw: bool = True,
     node_color: NODE_COLOR_TYPE = "prefix",
     node_color_aggr: COLOR_AGG_TYPE = None,
-    node_cmap: CMAP_TYPE = None,
+    node_cmap: CMAP_TYPE = "inferno",
     edge_color: EDGE_COLOR_TYPE = "samples",
-    edge_cmap: CMAP_TYPE = None,
-    errors: bool = False,
+    edge_cmap: CMAP_TYPE = "viridis",
     orientation: ORIENTATION_INPUT_TYPE = "vertical",
+    layout_reingold_tilford: bool = None,
+    min_cluster_number: MIN_CLUSTER_NUMBER_TYPE = 1,
+    border_size: float = 0.05,
+    figsize=None,
+    arrows=None,
+    node_size: float = 300,
+    node_size_edge: Optional[float] = None,
+    dpi: float = 500,
+    kk: Optional[int] = None,
 ) -> DiGraph:
     """
-    Create a plot of a clustering tree showing the relationship between clusterings \
-    at different resolutions.
 
     Parameters
     ----------
-    data : Union[str, Path, DataFrame]
+    data : Union[Path, str]
         Path of csv or DataFrame object.
     prefix : str
         String indicating columns containing clustering information.
-    images : Union[str, Path, dict[str, ndarray]
-        String indicating directory containing images. See more information on \
-         files expected in directory in Notes.
-    output_path : Union[str, Path], optional
-        Directory to output the final plot to. If None, then output not wrriten to file.
-    draw : bool, optional
-        Whether to draw the clustree. Defaults to True. If False and output_path \
-        supplied, will be overridden. Saving to file requires drawing.
-    node_color : Any, optional
-        For continuous colormap, use 'samples' or the name of a metadata column to \
-        color nodes by. For discrete colors, coloring by cluster resolution can be \
-        achieved by parsing 'prefix' or the same value parsed to the prefix parameter. \
-        Finally, it is possible to specify a fixed color (see Specifying colors in \
-        Matplotlib tutorial here: \
-        https://matplotlib.org/stable/tutorials/colors/colors.html). If None, default \
-        set to 'prefix' to color by resolution.
+    images : Union[Path, str]
+        Path of directory that contains images.
+    output_path : Union[Path, str], optional
+        Absolute path to save clustree drawing at. If file extension is supplied, must be .png. If None, then output not written to file.
+    draw : bool
+        Whether to draw the clustree. Defaults to True. If False and output_path supplied, will be overridden.
+    node_color : str
+        For continuous colormap, use 'samples' or the name of a metadata column to color nodes by. For discrete colors, use 'prefix' to color by resolution or specify a fixed color (see Specifying colors in Matplotlib tutorial here: https://matplotlib.org/stable/tutorials/colors/colors.html). If None, default set equal to value of prefix to color by resolution.
     node_color_aggr : Union[Callable, str], optional
-        If node_color is a column name then a function or string giving the name of a \
-        function to aggregate that column for samples in each cluster.
-    node_cmap : Union[mpl.colors.Colormap, str], optional
-        If node_color is 'samples' or a column name then a colourmap to use (see \
-        Colormap Matplotlib tutorial here: \
-        https://matplotlib.org/stable/tutorials/colors/colormaps.html).
-    edge_color : Any, optional
-        For continuous colormap, use 'samples'. For discrete colors, use 'prefix' to \
-        color by resolution or specify a fixed color (see Specifying colors in \
-        Matplotlib tutorial here: \
-        https://matplotlib.org/stable/tutorials/colors/colors.html). If None, default \
-        set to 'samples'.
-    edge_cmap : Union[mpl.colors.Colormap, str], optional
-        If edge_color is 'samples' then a colourmap to use (see Colormap Matplotlib \
-        tutorial here: https://matplotlib.org/stable/tutorials/colors/colormaps.html).
-    errors : bool, optional
-        Whether to raise an error if an image is missing from directory supplied to
-        images parameter. If False, a fake image will be created with text 'K_k' \
-        where K is cluster resolution and k is cluster number. Defaults to False.
-    orientation: Literal['vertical', 'horizontal'], optional
-        'vertical' or 'horizontal' to control orientation in which samples flow \
-        through the graph. Defaults to 'vertical'.
+        If node_color is a column name then a function or string giving the name of a function to aggregate that column for samples in each cluster.
+    node_cmap : Union[mpl.colors.Colormap, str]
+        If node_color is 'samples' or a column name then a colourmap to use (see Colormap Matplotlib tutorial here: https://matplotlib.org/stable/tutorials/colors/colormaps.html).
+    edge_color : str
+        For continuous colormap, use 'samples'. For discrete colors, use 'prefix' to color by resolution or specify a fixed color (see Specifying colors in Matplotlib tutorial here: https://matplotlib.org/stable/tutorials/colors/colors.html). If None, default set to 'samples'.
+    edge_cmap : Union[mpl.colors.Colormap, str]
+        If edge_color is 'samples' then a colourmap to use (see Colormap Matplotlib tutorial here: https://matplotlib.org/stable/tutorials/colors/colormaps.html).
+    orientation : Literal["vertical", "horizontal"]
+        Orientation of clustree drawing. Defaults to 'vertical'.
+    layout_reingold_tilford : bool, optional
+        Whether to use the Reingold-Tilford algorithm for node positioning. Defaults to True if (kk <= 12), False otherwise. Setting True not recommended if (kk > 12) due to memory bottleneck in igraph dependency.
+    min_cluster_number : Literal[0, 1]
+        0 if cluster number is (0, ..., K-1) or 1 if (1, ..., K). Defaults to 1.
+    border_size : float
+        Border width as proportion of image width. Defaults to 0.05.
+    figsize : tuple[float, float]
+        Parsed to matplotlib to determine figure size. Defaults to (kk/2, kk/2), clipped to a minimum of (3,3) and maximum of (10,10).
+    arrows : bool
+        Whether to add arrows to graph edges. Removing arrows alleviates appearance issue caused by arrows overlapping nodes. Defaults to True.
+    node_size : float
+        Size of nodes in clustree graph drawing. Parsed directly to networkx.draw_networkx_nodes. Deafult to 300.
+    node_size_edge: float
+        Controls edge start and end point. Parsed directly to networkx.draw_networkx_edges.
+    dpi : float
+        Controls resolution of output if saved to file.
+    kk : int, optional
+        Choose custom depth of clustree graph.
 
     Returns
     -------
-    DiGraph
-        The directed graph that represents the clustree.
+    networkx.DiGraph
+        Clustree drawing.
 
     Notes
     -------
-    The function must be supplied (a directory for) data, a prefix that indicates \
-    where to find cluster membership, and (a directory for) images.
+    Given data (containing cluster membership for K in 1, ..., kk) and a set of images, plot a graph showing the clustering tree. Edges show samples moving from a cluster at one resolution to a cluster at another resolution. Nodes are displayed as images chosen by user.
 
-    The function that reads images from given directory will determine maximum cluster \
-    resolution kk from the data and look for files named 'K_k' with 1 <= K <= kk and, \
-    for each K, 1 <= k <= K. There are requirements on the images in the directory:
-
-        - Their file name must be K_k.png.
-        - K is cluster resolution and k is cluster number.
-        - Only .png files are accepted.
-        - If a file or more is missing, behaviour will depend on errors parameter.
-        - Other files in the directory will be ignored.
-
+    The directory of images should contain files in format 'K_k.png', where K (in 1, ..., kk) is cluster resolution and k (in 1, ..., K) is cluster number. Alternatively, by setting the parameter min_cluster_number = 0, k is expected to take values in 0, ..., K-1.
     """
+
     _data = handle_data(data=data)
-    kk = get_and_check_cluster_cols(cols=_data.columns, prefix=prefix)
-    _images = handle_images(images=images, kk=kk, errors=errors)
+    kk = get_and_check_cluster_cols(cols=_data.columns, prefix=prefix, user_kk=kk)
+
+    border_size = float(border_size)
+    images = str(images)
+    if images[-1] != "/":
+        images = images + "/"
+    start_at_1 = bool(min_cluster_number)
+    if not figsize:
+        if kk < 6:
+            figsize = (3, 3)
+        else:
+            w = min([kk, 20]) / 2
+            figsize = (w, w)
+    if arrows is None:
+        arrows = False
+        if kk <= 10:
+            arrows = True
+    if not node_size_edge:
+        node_size_edge = 3 * node_size
+
+    if not layout_reingold_tilford:
+        layout_reingold_tilford = False
+        if kk < 13:
+            layout_reingold_tilford = True
+
     config = ClustreeConfig(
-        image_cf=_images,
         prefix=prefix,
         kk=kk,
         data=_data,
@@ -119,11 +132,28 @@ def clustree(
         node_cmap=node_cmap,
         edge_color=edge_color,
         edge_cmap=edge_cmap,
+        start_at_1=start_at_1,
     )
 
     dg = construct_clustree(cf=config)
     if draw or output_path:
-        draw_clustree(dg=dg, path=output_path, orientation=orientation)
+        draw_clustree(
+            dg=dg,
+            path=output_path,
+            orientation=orientation,
+            rt_layout=layout_reingold_tilford,
+            images=images,
+            figsize=figsize,
+            node_size=node_size,
+            node_size_edge=node_size_edge,
+            dpi=dpi,
+            border_size=border_size,
+            arrows=arrows,
+            node_color_sm=config.node_color_sm,
+            edge_color_sm=config.edge_color_sm,
+            node_color_title=config.node_color_legend_title,
+            edge_color_title=config.edge_color_legend_title,
+        )
     return dg
 
 
@@ -132,78 +162,3 @@ def construct_clustree(cf: ClustreeConfig) -> DiGraph:
     dg.add_nodes_from([(k, v) for k, v in cf.node_cf.items()])
     dg.add_edges_from([(v["start"], v["end"], v) for v in cf.edge_cf.values()])
     return dg
-
-
-def get_pos(dg: DiGraph, orientation: ORIENTATION_INPUT_TYPE) -> dict[int, np.ndarray]:
-    """
-    Produce position of each node. Use multipartite_layout, scale resulting positions \
-    to [0, 1] interval and flip graph vertically by returning (1 - pos). This forces \
-    the tree to position the root node at the top rather than the bottom.
-
-    :return: (x, y) coordinates of nodes
-    Parameters
-    ----------
-    dg
-        Clustree.
-
-    Returns
-    -------
-    dict[int, np.ndarray]
-        Dictionary of form node_id: (x, y). x,y in [0, 1].
-
-    """
-    pos = multipartite_layout(dg, subset_key="res", align="horizontal")
-    x_vals, y_vals = [v[0] for k, v in pos.items()], [v[1] for k, v in pos.items()]
-    min_y, max_y = min(y_vals), max(y_vals)
-    min_x, max_x = min(x_vals), max(x_vals)
-
-    norm_x = [(x - min_x) / (max_x - min_x) for x in x_vals]
-    norm_y = [(y - min_y) / (max_y - min_y) for y in y_vals]
-    if orientation == "vertical":
-        return {k: (x, 1 - y) for k, x, y in zip(list(pos.keys()), norm_x, norm_y)}
-    return {k: (y, x) for k, x, y in zip(list(pos.keys()), norm_x, norm_y)}
-
-
-def draw_clustree(
-    dg: DiGraph,
-    path: OUTPUT_PATH_TYPE,
-    orientation: ORIENTATION_INPUT_TYPE,
-):
-    pos = get_pos(dg=dg, orientation=orientation)
-    draw_with_images(dg=dg, pos=pos)
-    if path:
-        plt.savefig(path, dpi=400, bbox_inches="tight")
-
-
-def draw_with_images(
-    dg: DiGraph,
-    pos: dict[int, np.ndarray],
-    icon_size: float = 0.04,
-):
-    fig, ax = plt.subplots()
-
-    node_shape = "s"
-    colors = get_edge_attributes(dg, "edge_color").values()
-    alpha = get_edge_attributes(dg, "alpha").values()
-
-    draw_networkx_edges(
-        G=dg, pos=pos, node_shape=node_shape, edge_color=colors, alpha=list(alpha)
-    )
-
-    tr_figure = ax.transData.transform
-    tr_axes = fig.transFigure.inverted().transform
-
-    ax_range = ax.get_xlim()[1] - ax.get_xlim()[0]
-    icon_size *= ax_range
-    icon_center = icon_size / 2.0
-
-    for n in dg.nodes:
-        xf, yf = tr_figure(pos[n])
-        xa, ya = tr_axes((xf, yf))
-        a = plt.axes([xa - icon_center, ya - icon_center, icon_size, icon_size])
-
-        a.imshow(dg.nodes[n]["image_with_drawing"])
-
-        a.patch.set_visible(False)
-        a.axis("off")
-    ax.axis("off")
