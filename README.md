@@ -75,7 +75,7 @@ def clustree(
 * `edge_cmap` : If edge_color is 'samples' then a colourmap to use (see Colormap Matplotlib tutorial here: https://matplotlib.org/stable/tutorials/colors/colormaps.html).
 * `orientation` : Orientation of clustree drawing. Defaults to 'vertical'.
 * `layout_reingold_tilford` : Whether to use the Reingold-Tilford algorithm for node positioning. Defaults to True if (kk <= 12), False otherwise. Setting True not recommended if (kk > 12) due to memory bottleneck in igraph dependency.
-* `min_cluster_number` : 0 if cluster number is (0, ..., K-1) or 1 if (1, ..., K). Defaults to 1.
+* `min_cluster_number` : Cluster number can take values (0, ..., K-1) or (1, ..., K). If the former option is preferred, parameter should take value 0, and 1 otherwise. Defaults to None, in which case, minimum cluster number is found automatically.
 * `border_size` : Border width as proportion of image width. Defaults to 0.05.
 * `figsize` : Parsed to matplotlib to determine figure size. Defaults to (kk/2, kk/2), clipped to a minimum of (3,3) and maximum of (10,10).
 * `arrows` : Whether to add arrows to graph edges. Removing arrows alleviates appearance issue caused by arrows overlapping nodes. Defaults to True.
