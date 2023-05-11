@@ -31,7 +31,7 @@ def clustree(
     edge_cmap: CMAP_TYPE = "viridis",
     orientation: ORIENTATION_INPUT_TYPE = "vertical",
     layout_reingold_tilford: bool = None,
-    min_cluster_number: MIN_CLUSTER_NUMBER_TYPE = 1,
+    min_cluster_number: MIN_CLUSTER_NUMBER_TYPE = None,
     border_size: float = 0.05,
     figsize: tuple[float, float] = None,
     arrows: bool = None,
@@ -84,8 +84,10 @@ def clustree(
         Whether to use the Reingold-Tilford algorithm for node positioning. Defaults \
         to True if (kk <= 12), False otherwise. Setting True not recommended if \
         (kk > 12) due to memory bottleneck in igraph dependency.
-    min_cluster_number : Literal[0, 1]
-        0 if cluster number is (0, ..., K-1) or 1 if (1, ..., K). Defaults to 1.
+    min_cluster_number : Literal[0, 1], optional
+        Cluster number can take values (0, ..., K-1) or (1, ..., K). If the former \
+        option is preferred, parameter should take value 0, and 1 otherwise. \
+        Defaults to None, in which case, minimum cluster number is found automatically.
     border_size : float
         Border width as proportion of image width. Defaults to 0.05.
     figsize : tuple[float, float]
@@ -130,7 +132,10 @@ def clustree(
     images = str(images)
     if images[-1] != "/":
         images = images + "/"
-    start_at_1 = bool(min_cluster_number)
+    if min_cluster_number:
+        start_at_1 = bool(min_cluster_number)
+    else:
+        start_at_1 = int(_data[f"{prefix}1"].min()) == 1
     if not figsize:
         if kk < 6:
             figsize = (3, 3)
