@@ -19,7 +19,7 @@ EDGE_CONFIG_TYPE = [
 DATA_INPUT_TYPE = Union[str, Path, pd.DataFrame]
 IMAGE_INPUT_TYPE = Union[str, Path]
 ORIENTATION_INPUT_TYPE = Literal["vertical", "horizontal"]
-MIN_CLUSTER_NUMBER_TYPE = Literal[0, 1]
+MIN_CLUSTER_NUMBER_TYPE = Optional[Literal[0, 1]]
 CIRCLE_POS_TYPE = Optional[Literal["tl", "t", "tr", "l", "r", "bl", "b", "br"]]
 
 NODE_COLOR_TYPE = str  # e.g. 'samples', 'K', data col name
